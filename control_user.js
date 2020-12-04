@@ -1,7 +1,7 @@
 //constrol层主要是用来校验用户输入信息是否合法，同时将server层返回的数据进行格式化 规定：code:200=>成功,code:400=>错误
 
 const {returnError,returnSuccess} = require('../control/returnValue') //统一返回格式模板
-const {serverAllUser,serverUser,serverCreateUser} = require('../server/user') //引入server层，操作数据库
+const {serverAllUser,serverUser,serverCreateUser,serverDelateUser} = require('../server/user') //引入server层，操作数据库
 
 //查询所有用户
 const controlAllUser = async function () {
@@ -49,10 +49,25 @@ const controlCreateUser = async function (user) {
     }
 }
 
+//删除用户
+const controlDelateUser = async function (user) {
+    if (user.username) {
+        //user为真则调用server层
+        const data = await serverDelateUser(user.username)
+        if(data){
+            return returnSuccess (200,'删除用户成功',data.dataValues)
+        }else{
+            return returnError(400,'删除用户失败',[])
+        }
+    } else {
+        return returnError(400,'输入有误',[])
+    }
+}
 
 module.exports = {
     controlAllUser,
     controlUser,
-    controlCreateUser
+    controlCreateUser,
+    controlDelateUser
     
 }
