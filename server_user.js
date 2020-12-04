@@ -1,28 +1,30 @@
-const { users } = require('../../models/index')
+const Models = require('../../models/index')
 
 //查询所有用户
 const serverAllUser= async function () {
-    const allUser = await users.findAll({
-        attributes:['username']
+    const allUser = await Models.users.findAll({
+        attributes:['username'],
+        include: [{
+            model: Models.Tasks
+        }],
     })
     return allUser
 }
 
 //查询注册用户是否已存在
 const serverUser = async function (user) {
-    const userName = await users.findOne({
+    const userName = await Models.users.findOne({
         where: {
             username: user
         },
         attributes:['username']
     })
-    console.log(userName,"server层")
     return userName
 }
 
 //创建新用户
 const serverCreateUser = async function (user) {
-    const createUser = await users.create({
+    const createUser = await Models.users.create({
         username:user.username,
         password:user.password,
         phone:user.phone,
@@ -31,8 +33,20 @@ const serverCreateUser = async function (user) {
     })
     return createUser
 }
+
+//创建新用户
+const serverDelateUser = async function (user) {
+    const delateUser = await Models.users.destroy({
+        where:{
+            username:user
+        }
+    })
+    return delateUser
+}
+
 module.exports = {
     serverAllUser,
     serverUser,
-    serverCreateUser
+    serverCreateUser,
+    serverDelateUser
 }
