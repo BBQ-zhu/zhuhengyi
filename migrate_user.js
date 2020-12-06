@@ -1,57 +1,55 @@
-'use strict';
-module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-        comment:'用户id'
-      },
-      username: {
-        type: Sequelize.STRING,
-        allowNull: false,
-        comment:'用户名'
-      },
-      password:{
-        type: Sequelize.STRING,
-        allowNull: false,
-        comment:'用户密码'
-      },
-      phone:{
-        type:Sequelize.STRING,
-        comment:'手机号'
-      },
-      hobby:{
-        type:Sequelize.STRING,
-        defalultValue:'无',
-        comment:'爱好，收藏'
-      },
-      displed:{
-        type:Sequelize.BOOLEAN,
-        defalultValue:1,
-        comment:'是否注销用户'
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        comment:'创建时间'
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        comment:'更新时间'
-      }
-    },{
-      tableName:'user',
-      charset:'utf8mb4',
-      collate:'utf8mb4_bin',
-      indexes:[{}]
-    });
+module.exports = (sequelize, DataTypes) => {
+  const Tasks = sequelize.define('tasks')
+  const Users = sequelize.define(
+    'users', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
+    phone: {
+      type: DataTypes.STRING
+    },
+    hobby: {
+      type: DataTypes.STRING
+    },
+    displed: {
+      type: DataTypes.BOOLEAN
+    },
+    createdAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    },
+    updatedAt: {
+      allowNull: false,
+      type: DataTypes.DATE
+    }
+  },{
+    tableName:'users'
+    // ,charset: 'utf8',
+    // collate: 'utf8_general_ci'
 
-  },
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('users');
-  }
-};
+  })
+  // Users.associate = function (models) {
+    Users.hasMany(Tasks, {
+      foreignKey: 'user_id'
+    });
+  // };
+  return Users
+}
+    // 外键，hasMany 一对多
+    // users.hasMany(User, {
+    //   foreignKey: 'userId'
+    // })
+    // Score.belongsTo(users, {
+    //   foreignKey: 'userId'
+    // })
