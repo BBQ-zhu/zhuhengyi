@@ -5,9 +5,10 @@ const serverAllUser= async function () {
     const allUser = await Models.users.findAll({
         attributes:['username'],
         include: [{
-            model: Models.Tasks
-        }],
+            model: Models.tasks   //这里小写。。。
+        }]
     })
+    console.log(allUser)
     return allUser
 }
 
