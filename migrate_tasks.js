@@ -1,61 +1,71 @@
-'use strict';
-module.exports = {
-  up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('tasks', {
+// const Models = require('./index')
+module.exports = (sequelize, DataTypes) => {
+  const Users = sequelize.define('users')
+    const Tasks = sequelize.define(
+      'tasks', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
-        comment: '任务id'
+        type: DataTypes.INTEGER,
+        comment:'任务id'
       },
       company_name: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
-        comment: '公司名称'
+        comment:'公司名称'
       },
       active_time: {
-        type: Sequelize.DATE,
+        type: DataTypes.DATE,
         allowNull: false,
-        comment: '活动时间'
+        comment:'活动时间'
       },
       active_place: {
-        type: Sequelize.STRING,
+        type: DataTypes.STRING,
         allowNull: false,
-        comment: '活动地点'
+        comment:'活动地点'
       },
       active_all_price: {
-        type: Sequelize.FLOAT,
-        defalultValue: 0,
-        comment: '总价格'
+        type: DataTypes.FLOAT,
+        defalultValue:0,
+        comment:'总价格'
       },
       displed: {
-        type: Sequelize.BOOLEAN,
-        comment: '是否注销当前任务'
+        type: DataTypes.BOOLEAN,
+        comment:'是否注销当前任务'
       },
       user_id: {
-        type: Sequelize.INTEGER,
+        type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: 'Users',
-          key: 'id'
+        references:{
+            model:'Users',
+            key:'id'
         },
-        comment: '关联的用户id'
+        comment:'关联的用户id'
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-        comment: '更新时间'
+        type: DataTypes.DATE,
+        comment:'更新时间'
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-        comment: '创建时间'
+        type: DataTypes.DATE,
+        comment:'创建时间'
       }
-    });
+    },{})
+    // Tasks.associate = function (models) {
+    Tasks.belongsTo(Users, {
+        foreignKey: 'user_id'
+    })
+    // }
 
-  },
-  down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('tasks');
-  }
-};
+    // Tasks.associate = function (models) {
+    //     Tasks.belongsTo(models.Users, {
+    //       foreignKey: 'user_id'
+    //     })
+    //   };
+      return Tasks
+    }
+      
+      // 外键，hasMany 一对多
