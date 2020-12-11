@@ -9,7 +9,7 @@ module.exports = {
       password: md5('123456'),
       phone: '15828109500',
       hobby: '无',
-      displed: true,
+      displed: 1,
       createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: moment().format('YYYY-MM-DD HH:mm:ss')
     },
@@ -18,7 +18,7 @@ module.exports = {
       password: md5('123'),
       phone: '15828109500',
       hobby: '无',
-      displed: true,
+      displed: 1,
       createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: moment().format('YYYY-MM-DD HH:mm:ss')
 
@@ -28,7 +28,7 @@ module.exports = {
       password: md5('1234'),
       phone: '15828109500',
       hobby: '无',
-      displed: true,
+      displed: 1,
       createdAt: moment().format('YYYY-MM-DD HH:mm:ss'),
       updatedAt: moment().format('YYYY-MM-DD HH:mm:ss')
 
