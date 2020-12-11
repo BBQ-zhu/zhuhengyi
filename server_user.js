@@ -5,10 +5,9 @@ const serverAllUser= async function () {
     const allUser = await Models.users.findAll({
         attributes:['username'],
         include: [{
-            model: Models.tasks   //这里小写。。。
-        }]
+            model: Models.tasks  //小写，不要写Taks
+        }],
     })
-    console.log(allUser)
     return allUser
 }
 
@@ -35,7 +34,7 @@ const serverCreateUser = async function (user) {
     return createUser
 }
 
-//创建新用户
+//删除用户
 const serverDelateUser = async function (user) {
     const delateUser = await Models.users.destroy({
         where:{
