@@ -84,7 +84,8 @@ const serverAllDevices = async (allTask) => {
         var arrOne = allTask[i].dataValues
         for (let k = 0; k < arrOne.task_medium_tables.length; k++) {
             var arrTwo = arrOne.task_medium_tables[k].dataValues
-            let allDevies_one = await Models.devices_ones.findOne({ //
+            arrTwo.device_two_name = []
+            let allDevies_one = await Models.devices_ones.findOne({
                 attributes: ['id', 'device_name'],
                 where: {
                     id: arrTwo.devices_one_id
@@ -97,11 +98,32 @@ const serverAllDevices = async (allTask) => {
                     id: arrTwo.devices_two_id
                 }
             })
-            arrTwo.device_two_name = allDevies_two.dataValues //添加字段
-            arrTwo.device_two_name.devices_two_num = arrTwo.devices_two_num
 
-            // arrOne.active_all_price += allDevies_two.dataValues.device_price * arrTwo.devices_two_num  //计算总价格
+            allDevies_two.dataValues.devices_one_id = arrTwo.devices_one_id
+            allDevies_two.dataValues.devices_two_id = arrTwo.devices_two_id
+            allDevies_two.dataValues.devices_two_num = arrTwo.devices_two_num
+            arrTwo.device_two_name.push(allDevies_two.dataValues) //添加字段
         }
+    }
+
+    for (let i = 0; i < allTask.length; i++) {
+        var arrOne = allTask[i].dataValues
+        var result = [];
+        var obj = {};
+        for (let k = 0; k < arrOne.task_medium_tables.length; k++) {
+            var arrTwo = arrOne.task_medium_tables[k].dataValues
+            if (!obj[arrTwo.devices_one_id]) { //判断一级是否重复，重复则只保留一个
+                result.push(arrTwo);
+                obj[arrTwo.devices_one_id] = true;
+            } else {
+                result.forEach((item, index) => {
+                    if (item.devices_one_id == arrTwo.devices_one_id) {
+                        item.device_two_name = item.device_two_name.concat(arrTwo.device_two_name)
+                    }
+                })
+            }
+        }
+        arrOne.task_medium_tables = result
     }
     return allTask
 }
