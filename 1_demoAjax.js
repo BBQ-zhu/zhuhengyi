@@ -17,6 +17,27 @@
     <button @click="deleteLevel()">删除设备</button>
     <button @click="createTask()">创建\更新任务</button>
     <button @click="delateTask()">删除任务</button>
+    <!-- <input type="file" name="file" id="file" value="imgSrc" multiple="multiple" />
+    <input type="submit" value="提交" @click="inputFile()" />-->
+    <!-- uniapp上传图片 -->
+    <!-- https://blog.csdn.net/weixin_30279315/article/details/101966852 -->
+
+    <el-upload
+      class="upload-demo"
+      action="http://localhost:3000/uploadImg"
+      :on-preview="handlePreview"
+      :on-remove="handleRemove"
+      :before-remove="beforeRemove"
+      multiple
+      :limit="3"
+      :on-exceed="handleExceed"
+      :file-list="fileList"
+    >
+      <el-button size="small" type="primary">点击上传</el-button>
+      <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+    </el-upload>
+
+    <!-- uploadImg , app.js -->
     <Center />
     <Footer />
   </div>
@@ -35,7 +56,19 @@ export default {
       title: "注册页",
       username: "",
       password: "",
-      phone: ""
+      phone: "",
+      fileList: [
+        {
+          name: "food.jpeg",
+          url:
+            "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
+        },
+        {
+          name: "food2.jpeg",
+          url:
+            "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
+        }
+      ]
     };
   },
   components: {
@@ -43,6 +76,41 @@ export default {
     Footer
   },
   methods: {
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePreview(file) {
+      console.log(file);
+    },
+    handleExceed(files, fileList) {
+      this.$message.warning(
+        `当前限制选择 3 个文件，本次选择了 ${
+          files.length
+        } 个文件，共选择了 ${files.length + fileList.length} 个文件`
+      );
+    },
+    beforeRemove(file) {
+      return this.$confirm(`确定移除 ${file.name}？`);
+    },
+    //提交图片
+    inputFile() {
+      this.$ajax
+        .post(
+          "http://localhost:3000/uploadImg",
+          this.$qs.stringify(this.imgSrc)
+        )
+        .then(res => {
+          if (res.data.data.code == 200) {
+            console.log(res.data.data);
+          } else {
+            console.log(res.data.data);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+
     //删除任务
     delateTask() {
       this.$ajax
@@ -69,7 +137,7 @@ export default {
               active_place: "地点1",
               active_time: "2020-12-11T18:31:58.000Z",
               company_name: "某某12222",
-              id: 2, 
+              id: 2,
               remarks: "备注信息1",
               user_id: 1,
               task_medium_tables: [
