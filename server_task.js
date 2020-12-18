@@ -1,85 +1,94 @@
 const Models = require('../../models/index')
-//删除任务
+
+
+//添加任务、更新任务
+const serverCreateTask = async function (CreateTask) {
+    // console.log(CreateTask)
+    if (CreateTask.id) {
+        var createTasks = await Models.tasks.update({
+            active_all_price: CreateTask.active_all_price,
+            active_place: CreateTask.active_place,
+            active_time: CreateTask.active_time,
+            company_name: CreateTask.company_name,
+            remarks: CreateTask.remarks,
+            displed: 1,
+            user_id: 1
+        }, {
+            where: {
+                id: CreateTask.id
+            }
+        })
+    } else {
+        var createTasks = await Models.tasks.create({
+            active_all_price: CreateTask.active_all_price,
+            active_place: CreateTask.active_place,
+            active_time: CreateTask.active_time,
+            company_name: CreateTask.company_name,
+            remarks: CreateTask.remarks,
+            displed: 1,
+            user_id: 1
+        })
+    }
+
+    return true
+}
+//增加一二级设备
+const createTask_medium_tables = async function (CreateTask) {
+    // console.log(CreateTask)
+    var createTask_medium_table = await Models.task_medium_tables.create({
+        task_id: CreateTask.task_id,
+        devices_one_id: CreateTask.devices_one_id,
+        devices_two_id: CreateTask.devices_two_id,
+        devices_two_num: CreateTask.devices_two_num,
+        displed: 1,
+    })
+    return true
+}
+//删除二级设备
+const delateTask_medium_tables = async function (DelateTask) {
+    var createTask_medium_table = await Models.task_medium_tables.destroy({
+        where: {
+            task_id: DelateTask.task_id,
+            devices_two_id: DelateTask.devices_two_id
+        }
+    })
+    return true
+}
+
+//删除整个任务及下属设备
 const serverDelateTask = async function (DelateTask) {
-    console.log(DelateTask.id)
     const delateTask_medium_tables = await Models.task_medium_tables.destroy({
         where: {
-            task_id: DelateTask.id
+            task_id: DelateTask.task_id
         }
     })
     const delateTask = await Models.tasks.destroy({
         where: {
-            id: DelateTask.id
+            id: DelateTask.task_id
         }
     })
     return true
 }
+//查询所有任务及下属设备
+const serverAllTask = async function (AllTask) {
 
-//添加任务、更新任务
-const serverCreateTask = async function (CreateTask) {
-    
-        // if (CreateTask[0].id) {
-        //     const delateTask_medium_tables = await Models.task_medium_tables.destroy({
-        //         where: {
-        //             task_id: CreateTask[0].id
-        //         }
-        //     })
-        //     const delateTask = await Models.tasks.destroy({
-        //         where: {
-        //             id: CreateTask[0].id
-        //         }
-        //     })
-        // }
-    
-    
-
-    for (let i in CreateTask) {
-        //判断当前任务是新增还是修改
-        
-
-        var createTasks = await Models.tasks.create({
-            active_all_price: CreateTask[i].active_all_price,
-            active_place: CreateTask[i].active_place,
-            active_time: CreateTask[i].active_time,
-            company_name: CreateTask[i].company_name,
-            remarks: CreateTask[i].remarks,
-            displed: 1,
-            user_id: '1',
-        })
-        //需要先创建tasks表，待生成id之后，在新增关联表的数据（task_id来源于主表的id）
-        // for (let k in CreateTask[i].task_medium_tables) {
-        //     var createTask_medium_tables = await Models.task_medium_tables.create({
-        //         task_id: CreateTask[i].task_medium_tables[k].task_id,
-        //         devices_one_id: CreateTask[i].task_medium_tables[k].devices_one_id,
-        //         devices_two_id: CreateTask[i].task_medium_tables[k].devices_two_id,
-        //         devices_two_num: CreateTask[i].task_medium_tables[k].devices_two_num,
-        //         displed: 1,
-        //     })
-        // }
-
-
-
-    }
-    // if (createTask && createTask_medium_tables) {
-    return true
-    // }
-
-}
-
-//查询所有任务
-const serverAllTask = async function () {
     const allTask = await Models.tasks.findAll({
         attributes: ['id', 'company_name', 'active_time', 'active_place', 'active_all_price', 'remarks', 'user_id'],
         include: [{
             model: Models.task_medium_tables //小写，不要写Taks
         }],
+        // order: ['id desc'],
+        limit: parseInt(AllTask.limit), //每一页条数
+        offset: parseInt(AllTask.offset) //第几页
     })
+
     return serverAllDevices(allTask)
 
 }
 
 //查询一二级设备（内部使用）
 const serverAllDevices = async (allTask) => {
+    // console.log(allTask)
     for (let i = 0; i < allTask.length; i++) {
         var arrOne = allTask[i].dataValues
         for (let k = 0; k < arrOne.task_medium_tables.length; k++) {
@@ -127,10 +136,12 @@ const serverAllDevices = async (allTask) => {
     }
     return allTask
 }
-
+ 
 
 module.exports = {
     serverAllTask,
     serverCreateTask,
-    serverDelateTask
+    serverDelateTask,
+    delateTask_medium_tables,
+    createTask_medium_tables
 }
