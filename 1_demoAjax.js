@@ -17,26 +17,7 @@
     <button @click="deleteLevel()">删除设备</button>
     <button @click="createTask()">创建\更新任务</button>
     <button @click="delateTask()">删除任务</button>
-    <!-- <input type="file" name="file" id="file" value="imgSrc" multiple="multiple" />
-    <input type="submit" value="提交" @click="inputFile()" />-->
-    <!-- uniapp上传图片 -->
-    <!-- https://blog.csdn.net/weixin_30279315/article/details/101966852 -->
-
-    <el-upload
-      class="upload-demo"
-      action="http://localhost:3000/uploadImg"
-      :on-preview="handlePreview"
-      :on-remove="handleRemove"
-      :before-remove="beforeRemove"
-      multiple
-      :limit="3"
-      :on-exceed="handleExceed"
-      :file-list="fileList"
-    >
-      <el-button size="small" type="primary">点击上传</el-button>
-      <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-    </el-upload>
-
+    <button @click="allTasks()">查询所有任务</button>
     <!-- uploadImg , app.js -->
     <Center />
     <Footer />
@@ -53,6 +34,8 @@ export default {
   name: "Index",
   data() {
     return {
+      limit: 5,
+      offset: 0,
       title: "注册页",
       username: "",
       password: "",
@@ -76,41 +59,39 @@ export default {
     Footer
   },
   methods: {
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePreview(file) {
-      console.log(file);
-    },
-    handleExceed(files, fileList) {
-      this.$message.warning(
-        `当前限制选择 3 个文件，本次选择了 ${
-          files.length
-        } 个文件，共选择了 ${files.length + fileList.length} 个文件`
-      );
-    },
-    beforeRemove(file) {
-      return this.$confirm(`确定移除 ${file.name}？`);
-    },
-    //提交图片
-    inputFile() {
+    allTasks() {
+      //查询所有任务  /download/excles
+      //每次进入任务详情，不用自动计算价格，添加或删除设备时，后端也需要更新总价，前端更新也要更新价格，防止意外退出时价格对应不上
+      //将3个task模拟数据中的active_time变为string类型
+      //活动时间大于当前时间前端则标红右上方
+      let arr2 = {
+        statistics: "2", //是否是统计界面(0,1,2)
+        limit: this.limit,
+        offset: this.limit * this.offset,
+        startTime: "",
+        endTime: "",
+        company_name: "",
+        active_place: ""
+        // startTime: "2021-01-05 09:19:31",
+        // endTime: "2020-01-08 09:19:31",
+        // company_name: "某某2",
+        // active_place: "地点1",
+        // active_all_price: 100
+      };
       this.$ajax
-        .post(
-          "http://localhost:3000/uploadImg",
-          this.$qs.stringify(this.imgSrc)
-        )
+        // .post("http://localhost:3000/download/excles")
+        .post("http://localhost:3000/allTask", this.$qs.stringify(arr2))
         .then(res => {
+          console.log(res.data.data);
           if (res.data.data.code == 200) {
-            console.log(res.data.data);
-          } else {
-            console.log(res.data.data);
+            this.offset += 1;
           }
+          console.log(this.offset);
         })
         .catch(error => {
           console.log(error);
         });
     },
-
     //删除任务
     delateTask() {
       this.$ajax
@@ -307,18 +288,12 @@ export default {
       .catch(error => {
         console.log(error);
       });
-
-    //查询所有任务
-    this.$ajax
-      .post("http://localhost:3000/allTask")
-      .then(res => {
-        console.log(res.data.data);
-      })
-      .catch(error => {
-        console.log(error);
-      });
   }
 };
 </script>
 
-<style></style>
+<style>
+/* .name{
+    width:1px!important
+  } */
+</style>
