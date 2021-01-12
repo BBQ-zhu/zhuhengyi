@@ -29,11 +29,11 @@
 import Center from "@/components/Center.vue";
 import Footer from "@/components/Footer.vue";
 // import axios from "axios";
-
 export default {
   name: "Index",
   data() {
     return {
+      downFileName: "xwxw",
       limit: 5,
       offset: 0,
       title: "注册页",
@@ -51,7 +51,21 @@ export default {
           url:
             "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
         }
-      ]
+      ],
+      jsonData: [
+        {
+          id: "1",
+          grade: "大二",
+          name: "Mike"
+        },
+        {
+          id: "1",
+          grade: "大二",
+          name: "Mike"
+        }
+      ],
+      str: "",
+      jsonList: {}
     };
   },
   components: {
@@ -60,9 +74,6 @@ export default {
   },
   methods: {
     allTasks() {
-      //查询所有任务  /download/excles
-      //每次进入任务详情，不用自动计算价格，添加或删除设备时，后端也需要更新总价，前端更新也要更新价格，防止意外退出时价格对应不上
-      //将3个task模拟数据中的active_time变为string类型
       //活动时间大于当前时间前端则标红右上方
       let arr2 = {
         statistics: "2", //是否是统计界面(0,1,2)
@@ -72,19 +83,16 @@ export default {
         endTime: "",
         company_name: "",
         active_place: ""
-        // startTime: "2021-01-05 09:19:31",
-        // endTime: "2020-01-08 09:19:31",
-        // company_name: "某某2",
-        // active_place: "地点1",
-        // active_all_price: 100
       };
       this.$ajax
-        // .post("http://localhost:3000/download/excles")
         .post("http://localhost:3000/allTask", this.$qs.stringify(arr2))
         .then(res => {
-          console.log(res.data.data);
+          console.log(res.data.data.data);
           if (res.data.data.code == 200) {
-            this.offset += 1;
+            this.jsonData = res.data.data.data;
+            //表名，数据，表头名称 //this.deviesList
+            this.refactor();
+            // this.downLoadExcel();
           }
           console.log(this.offset);
         })
@@ -92,10 +100,138 @@ export default {
           console.log(error);
         });
     },
+    refactor() {
+      // var tableName = this.company_name + '('+ this.start_time + '~' + this.end_time + ')'
+      var tableName = '测试'
+      var tableData = []; //数据初始化
+      var headerName = "名称,时间,地点,"; //拼接表头名称初始化 active_all_price
+      var jsonList = {
+        company_name: "",
+        active_time: "",
+        active_place: ""
+      };
+      this.deviesList.forEach(item => {
+        //遍历所有一级设备添加输出字段
+        headerName = headerName + item.device_name + ",";
+        jsonList["deviceId_" + item.id] = "";
+      });
+      headerName = headerName + "合计(元)\n";
+      jsonList.active_all_price = 0;
+      for (let item of this.jsonData) {
+        var dataJson = JSON.parse(JSON.stringify(jsonList));
+        dataJson.company_name = item.company_name;
+        dataJson.active_time = item.active_time;
+        dataJson.active_place = item.active_place;
+        dataJson.active_all_price = item.active_all_price;
+        if (item.task_medium_tables.length) {
+          for (var val of item.task_medium_tables) {
+            if (
+              val.device_two_name &&
+              val.device_one_name.indexOf("桁架") != -1
+            ) {
+              let allValue = 0;
+              let allMini = "";
+              for (let value of val.device_two_name) {
+                allValue +=
+                  parseFloat(value.device_name) * value.devices_two_num;
+                allMini +=
+                  value.device_name + "x" + value.devices_two_num + ",";
+              }
+              dataJson["deviceId_" + val.devices_one_id] =
+                "共" + allValue + "米," + allMini;
+            } else if (
+              val.device_two_name &&
+              val.device_one_name.indexOf("舞台") != -1
+            ) {
+              let allValue = 0;
+              let allMini = "";
+              for (let value of val.device_two_name) {
+                if (parseFloat(value.device_name) == 0.6) {
+                  //0.6米的小板子特殊处理
+                  allValue +=
+                    parseFloat(value.device_name) *
+                    parseFloat(value.device_name) *
+                    0.5 *
+                    value.devices_two_num;
+                } else {
+                  allValue +=
+                    parseFloat(value.device_name) *
+                    parseFloat(value.device_name) *
+                    value.devices_two_num;
+                }
+                allMini +=
+                  value.device_name + "x" + value.devices_two_num + ",";
+              }
+
+              dataJson["deviceId_" + val.devices_one_id] =
+                "共" + allValue + "平方," + allMini;
+            } else {
+              let allValue = "";
+              for (let value of val.device_two_name) {
+                allValue +=
+                  value.device_name + "x" + value.devices_two_num + ",";
+              }
+              dataJson["deviceId_" + val.devices_one_id] = allValue;
+            }
+          }
+        }
+        // console.log(dataJson);
+        tableData.push(dataJson);
+      }
+      console.log(tableData);
+      this.downLoadExcel(tableData, headerName, tableName)
+    },
+    downLoadExcel(tableData, headerName, tableName) {
+      // var str = "ID,年纪,姓名\n"; headerName
+      for (let i = 0; i < tableData.length; i++) {
+        for (let item in tableData[i]) {
+          headerName += `${tableData[i][item] + "\t,"}`;
+        }
+        console.log(headerName);
+        headerName = headerName + "\n";
+      }
+
+      if ("download" in document.createElement("a")) {
+        // 非IE下载
+        var blob = new Blob([headerName], {
+          //解决中文乱码问题
+          type: "text/plain;charset=utf-8"
+        });
+
+        blob = new Blob([String.fromCharCode(0xfeff), blob], {
+          type: blob.type
+        });
+        var object_url = window.URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = object_url;
+        link.download = tableName + ".xls";
+        document.body.appendChild(link);
+        link.click();
+        URL.revokeObjectURL(link.href); // 释放URL 对象
+        document.body.removeChild(link);
+      } else {
+        // IE10+下载
+
+        let blob = new Blob([headerName], {
+          //解决中文乱码问题
+          type: "text/plain;charset=utf-8"
+        });
+
+        blob = new Blob([String.fromCharCode(0xfeff), blob], {
+          type: blob.type
+        });
+        const fileName = tableName + ".xls";
+        navigator.msSaveBlob(blob, fileName);
+      }
+    },
+
     //删除任务
     delateTask() {
       this.$ajax
-        .post("http://localhost:3000/delateTask", this.$qs.stringify({ id: 2 }))
+        .post(
+          "http://localhost:3000/delateTask",
+          this.$qs.stringify({ task_id: 1 })
+        )
         .then(res => {
           if (res.data.data.code == 200) {
             console.log(res.data.data);
@@ -284,6 +420,7 @@ export default {
       .post("http://localhost:3000/devices")
       .then(res => {
         console.log(res.data.data);
+        this.deviesList = res.data.data.data;
       })
       .catch(error => {
         console.log(error);
