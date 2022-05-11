@@ -1,0 +1,31 @@
+47、vue-router实现原理
+1.vue的单页面应用是基于路由和组件的，路由用于设定访问路径，并将路径和组件映射起来
+2.传统的页面应用，是用一些超链接来实现页面切换和跳转的。
+在vue-router单页面应用中，则是路径之间的切换，也就是组件的切换。路由模块的本质 就是建立起url和页面之间的映射关系。
+至于为啥不能用a标签，这是因为用Vue做的都是单页应用，就相当于只有一个主的index.html页面，所以你写的标签是不起作用的，必须使用vue-router来进行管理。
+48、详述虚拟DOM
+1、state数据
+2、JSX模板
+3、数据 + 模板 生成虚拟DOM(虚拟DOM就是一个JS对象，用它来描述真实DOM)（损耗一点性能）
+虚拟DOM：['div’, {id: 'abc’}, ['span’, '’, ‘hello world’]]
+4、用虚拟DOM的结构生成真实的DOM -> 视图显示
+真实DOM：
+5、state发生了变化
+6、数据 + 模板 生成新的虚拟DOM：['div’, {id: 'abc’}, ['span’, '’, ‘hi world’]]（极大提升性能）
+7、比较原始虚拟DOM和新的虚拟DOM的区别，找到的区别是span中的内容发生了变化（极大提升了性能）
+8、直接操作DOM，改变span中的内容
+总结：
+减少了真实DOM的创建及对比，创建都是JS对象，对比的也都是JS的对象，在JS底层实现了极大的性能飞越
+组件生成流程：
+JSX -> JS对象(虚拟DOM) -> 真实的DOM
+用React.createElement改写JSX模板：
+JSX：return
+{ item }
+
+JSX -> JS对象(虚拟DOM) -> 真实的DOM
+React.createElement('div’, {}, React.createElement('span’, {}, ‘item’))
+JSX -> createElement -> JS对象(虚拟DOM) -> 真实的DOM
+虚拟DOM优点：
+1、性能提升了
+2、它使得跨端应用得以实现，Ract Native
+React可以写原生应用了，得益于React中的虚拟DOM，如果没有虚拟DOM是不能写原生应用的。原生系统是不支持DOM不存在DOm这个概念的，但是支持虚拟DOM（虚拟DOM就是一个JS对象）；虚拟DOM可以在浏览器端被解析为真实的DOM，在原生端可以被解析原生所支持的组件等格式
