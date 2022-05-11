@@ -1,0 +1,228 @@
+60、CSS动画（transition、animation）animation中的关键帧怎么设置
+Transform：大小、位置、颜色、变形等等这些属性。（:hover :focus :checked 媒体查询触发 JavaScript触发。）
+Transition：时间 效果 延迟
+•	transition-property：规定对哪个属性进行过渡。
+•	transition-duration：定义过渡的时间，默认是0。
+•	transition-timing-function：定义过渡动画的缓动效果，如淡入、淡出等。
+•	linear 规定以相同速度开始至结束的过渡效果（等于 cubic-bezier(0,0,1,1)）。
+•	ease（默认值）规定慢速开始，然后变快，然后慢速结束的过渡效果（cubic-bezier(0.25,0.1,0.25,1)）。
+•	ease-in 规定以慢速开始的过渡效果（等于 cubic-bezier(0.42,0,1,1)）。
+•	ease-out 规定以慢速结束的过渡效果（等于 cubic-bezier(0,0,0.58,1)）。
+•	ease-in-out 规定以慢速开始和结束的过渡效果（等于 cubic-bezier(0.42,0,0.58,1)）。
+•	cubic-bezier(n,n,n,n) 在 cubic-bezier 函数中定义自己的值。可能的值是 0 至 1 之间的数值。
+•	transition-delay：规定过渡效果的延迟时间，即在过了这个时间后才开始动画，默认是0。
+注意：单纯的代码不会触发任何过渡操作，需要通过用户的行为（如点击，悬浮等）触发。可触发的方式有：:hover :focus :checked 媒体查询触发 JavaScript触发。
+关键帧动画
+animation属性将这些状态一次性赋给该元素。
+第一步：通过类似Flash动画中的帧来声明一个动画。
+关键帧动画的定义方式也比较特殊，它使用了一个关键字 @keyframes 来定义动画。具体格式为：
+@keyframes 动画名称 {    时间点 {元素状态}    时间点 {元素状态}    …}
+一般来说，0%和100%这两个关键帧是必须要定义的。0%可以由from代替，100%可以由to代替。
+第二步：在目标元素的样式声明中使用animation属性调用关键帧声明的动画。
+现在我们知道了怎么去定义一个关键帧动画了，那怎么去实现这个动画呢？其实很简单，只要把这个动画绑定到某个要进行动画的元素上就行了。把动画绑定到元素上，我们可以使用animation属性。
+可配置的参数有：
+•	animation-name：none为默认值，将没有任何动画效果，其可以用来覆盖任何动画。
+•	animation-duration：默认值为0s，意味着动画周期为0s，也就是没有任何动画效果。
+•	animation-timing-function：与transition-timing-function一样。
+•	animation-delay：在开始执行动画时需要等待的时间。
+•	animation-iteration-count：定义动画的播放次数，默认为1，如果为infinite，则无限次循环播放。
+•	animation-direction：默认为nomal，每次循环都是向前播放，（0-100）。另一个值为alternate，动画播放为偶数次则向前播放，如果为基数词就反方向播放。
+•	animation-state：默认为running，播放，paused，暂停。
+•	animation-fill-mode：定义动画开始之前和结束之后发生的操作。
+•	none（默认值），动画结束时回到动画没开始时的状态；
+•	forwards，动画结束后继续应用最后关键帧的位置，即保存在结束状态；
+•	backwards，让动画回到第一帧的状态；
+•	both：轮流应用forwards和backwards规则；
+注意：只要把定义好的动画绑定到元素上，就能实现关键帧动画了，而不是像第一种过渡动画那样，需要一个状态的改变才能触发动画。
+.anima:hover{
+            animation:1s changeBg;
+        }
+        @keyframes changeBg {
+            0%{
+                background:green
+            }
+            50%{
+                background:red;
+            }
+            100%{
+                background: green;
+            }
+        }
+61、flex布局的属性
+http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html
+62、xss预防
+输入内容：关键字过滤，检测，以及转码（MD5）
+63、ajax原理
+Ajax的原理简单来说通过XmlHttpRequest对象来向服务器发异步请求，从服务器获得数据，然后用javascript来操作DOM而更新页面。这其中最关键的一步就是从服务器获得请求数据。要清楚这个过程和原理，我们必须对 XMLHttpRequest有所了解。
+XmlHttpRequest对象它的属性有：
+  　　onreadystatechange  每次状态改变所触发事件的事件处理程序。
+  　　responseText     从服务器进程返回数据的字符串形式。
+  　　responseXML    从服务器进程返回的DOM兼容的文档数据对象。
+  　　status           从服务器返回的数字代码，比如常见的404（未找到）和200（已就绪）
+  　　status Text       伴随状态码的字符串信息
+  　　readyState       对象状态值
+　　　　0 (未初始化) 对象已建立，但是尚未初始化（尚未调用open方法）
+　　　　1 (初始化) 对象已建立，尚未调用send方法
+　　　　2 (发送数据) send方法已调用，但是当前的状态及http头未知
+　　　　3 (数据传送中) 已接收部分数据，因为响应及http头不全，这时通过responseBody和responseText获取部分数据会出现错误，
+　　　　4 (完成) 数据接收完毕,此时可以通过通过responseXml和responseText获取完整的回应数据
+64、JS继承的实现方式
+既然要实现继承，那么首先我们得有一个父类，代码如下：
+// 定义一个动物类
+function Animal (name) {
+  // 属性
+  this.name = name || 'Animal';
+  // 实例方法
+  this.sleep = function(){
+    console.log(this.name + '正在睡觉！');
+  }
+}
+// 原型方法
+Animal.prototype.eat = function(food) {
+  console.log(this.name + '正在吃：' + food);
+};
+1、原型链继承
+核心： 将父类的实例作为子类的原型
+function Cat(){ 
+}
+Cat.prototype = new Animal();
+Cat.prototype.name = 'cat';
+
+//　Test Code
+var cat = new Cat();
+
+2、构造继承
+核心：使用父类的构造函数来增强子类实例，等于是复制父类的实例属性给子类（没用到原型）
+function Cat(name){
+  Animal.call(this);
+  this.name = name || 'Tom';
+}
+
+3、实例继承
+核心：为父类实例添加新特性，作为子类实例返回
+function Cat(name){
+  var instance = new Animal();
+  instance.name = name || 'Tom';
+  return instance;
+}
+4、拷贝继承
+function Cat(name){
+  var animal = new Animal();
+  for(var p in animal){
+    Cat.prototype[p] = animal[p];
+  }
+  // 2020年10月10日21点36分：感谢 @baclt 的指出，如下实现修改了原型对象，会导致单个实例修改name，会影响所有实例的name值
+  // Cat.prototype.name = name || 'Tom'; 错误的语句，下一句为正确的实现
+  this.name = name || 'Tom';
+}
+
+// Test Code
+var cat = new Cat();
+5、组合继承
+核心：通过调用父类构造，继承父类的属性并保留传参的优点，然后通过将父类实例作为子类原型，实现函数复用
+function Cat(name){
+  Animal.call(this);
+  this.name = name || 'Tom';
+}
+Cat.prototype = new Animal();
+
+// 感谢 @学无止境c 的提醒，组合继承也是需要修复构造函数指向的。
+
+Cat.prototype.constructor = Cat;
+
+// Test Code
+var cat = new Cat();
+65、http缓存头有哪些？ Expires、Cache-Control、Last-Modified等
+在请求一个静态文件的时候（图片，css，js）等，这些文件的特点是文件不经常变化，将这些不经常变化的文件存储起来，对客户端来说是一个优化用户浏览体验的方法。那么这个就是客户端缓存的意义了。
+1、Expires/Cache-Control
+HTTP头中的Expires和Cache-Control就是完成这个事情的。
+当客户端第一次访问资源的时候，服务端在返回资源内容的同时也返回了Expires: Sun, 16 Oct 2016 05:43:02 GMT。
+服务端告诉浏览器： 你Y的先把这个文件给我缓存起来，在这个过期时间之前，这个文件都不会变化了，你下次需要这个文件的时候，你就不要过来找我要了，你就去缓存中拿就好了，又快又好。
+2、Last-Modified/ If-Modify-since
+客户端第一次访问资源的时候，服务端返回资源内容的同时返回了Last-Modifed:Wed, 07 Aug 2013 15:32:18 GMT 服务端在告诉客户端：你获取的这个文件我最后的修改时间是Wed, 07 Aug 2013 15:32:18 GMT 。浏览器在获取这个文件存到缓存中的时候，给缓存中的文件同时记录上这个最后修改时间。
+第二次访问的时候（我们假设这里没有设置expires或者cache-control）。那么服务端访问资源的时候会带上If-Modify-since:Wed, 07 Aug 2013 15:32:18 GMT ；
+客户端询问服务端：喂，我需要的这个资源其实我这边已经有缓存了，我的缓存文件的最后修改时间是这个是，如果你那边的资源在这个时间以后没有修改的话，你就告诉我一下就好了，不需要返回实际的资源内容。反之，要是你有修改的话，你就把文件内容返回给我吧。
+服务端回应说：哦。行为是看下资源是否在这个时间后没有修改过，如果没有修改返回个304告诉客户端，我没有修改过。如果有变化了，我就返回200，并且带上资源内容。
+3、ETag/ If-None-Match。
+客户端第一次访问资源的时候，服务端返回资源内容的同时返回了Last-Modifed:Wed, 07 Aug 2013 15:32:18 GMT 服务端在告诉客户端：你获取的这个文件我最后的修改时间是Wed, 07 Aug 2013 15:32:18 GMT 。浏览器在获取这个文件存到缓存中的时候，给缓存中的文件同时记录上这个最后修改时间。
+第二次访问的时候（我们假设这里没有设置expires或者cache-control）。那么服务端访问资源的时候会带上If-Modify-since:Wed, 07 Aug 2013 15:32:18 GMT ；
+客户端询问服务端：喂，我需要的这个资源其实我这边已经有缓存了，我的缓存文件的最后修改时间是这个是，如果你那边的资源在这个时间以后没有修改的话，你就告诉我一下就好了，不需要返回实际的资源内容。反之，要是你有修改的话，你就把文件内容返回给我吧。
+服务端回应说：哦。行为是看下资源是否在这个时间后没有修改过，如果没有修改返回个304告诉客户端，我没有修改过。如果有变化了，我就返回200，并且带上资源内容。
+66、meta定义viewport ，手机h5与pc端的区别
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+手机默认的layout-viewport是多大呢，“layout viewport有多宽？每个浏览器都不一样，Safari iPhone为980px，Opera为850px，Android WebKit为800px，最后IE为974px。”
+虽然viewport解决了我们的一些问题,但是它也为我们带来了一些遗留问题.
+在HTML的head标签里加上 <meta name="viewport" content="width=device-width"> ，就告诉浏览器我是移动端页面，用的是移动端的设计，对于视口 viewport，我要把默认文档宽度 width （布局视口宽度）设置为逻辑像素宽度 device-width（视觉视口宽度、设备宽度、屏幕宽度）。
+如果不加这个meta，那默认的文档宽度就是 980px 。
+67、rem布局原理深度理解
+物理像素、设备像素之间的差距导致不一致
+2.1、em
+　　em作为font-size的单位时，其代表父元素的字体大小，em作为其他属性单位时，代表自身字体大小——MDN
+　　比如父元素font-size:12px;
+　　自身元素如果写成：font-sise:2em;则自身元素用px表示就是24px（相对父元素字体大小）;
+　　但是自身元素设置：width:2rem,那么自身元素用px表示就是48px（相对自身字体大小）；
+       2.2、rem
+　　rem作用于非根元素时，相对于根元素字体大小；rem作用于根元素字体大小时，相对于其出初始字体大小——MDN
+　　比如根元素（html）设置font-size=12px; 非根元素设置width:2rem;则换成px表示就是24px；
+　　如果根元素设置成font-size=1rem;则根元素换成px就是相对于初始字体大小，一般是12px；
+68、MVC和MVVM的区别
+  MVVM即Model-View-ViewModel的简写。即模型-视图-视图模型。模型（Model）指的是后端传递的数据。视图(View)指的是所看到的页面。视图模型(ViewModel)是mvvm模式的核心，它是连接view和model的桥梁。它有两个方向：一是将模型（Model）转化成视图(View)，即将后端传递的数据转化成所看到的页面。实现的方式是：数据绑定。二是将视图(View)转化成模型(Model)，即将所看到的页面转化成后端的数据。实现的方式是：DOM 事件监听。这两个方向都实现的，我们称之为数据的双向绑定。
+      MVC是Model-View- Controller的简写。即模型-视图-控制器。M和V指的意思和MVVM中的M和V意思一样。C即Controller指的是页面业务逻辑。使用MVC的目的就是将M和V的代码分离。MVC是单向通信。也就是View跟Model，必须通过Controller来承上启下。MVC和MVVM的区别并不是VM完全取代了C，只是在MVC的基础上增加了一层VM，只不过是弱化了C的概念，ViewModel存在目的在于抽离Controller中展示的业务逻辑，而不是替代Controller，其它视图操作业务等还是应该放在Controller中实现。也就是说MVVM实现的是业务逻辑组件的重用，使开发更高效，结构更清晰，增加代码的复用性。
+ 
+Figure 1MVC
+ 
+Figure 2MVVM
+69、this指针
+借助阮一峰老师的话：它代表函数运行时，自动生成的一个内部对象，只能在函数内部使用。这句话看似平常，可是要非常注意三个字：“运行时”，这说明this关键字只与函数的执行环境有关，而与声明环境没有关系。也就是这个this到底代表的是什么对象要等到函数运行时才知道，有点类似函数定义时的参数列表只在函数调用时才传入真正的对象。理解了这一点对后面this关键字规律的掌握有很大帮助。
+
+     this关键字虽然会根据环境变化，但是它始终指向的是调用当前函数的那个对象。这就引出了JS中函数调用的问题。在JS中调用函数的模式可以分为4种：方法调用模式、函数调用模式、构造器调用模式、apply调用模式。这些模式在如何初始化关键参数this上存在差异。
+70、web安全CSRF和XSS
+CSRF
+１、基本概念和缩写
+CSRF（Cross-site request forgery）跨站请求伪造，是通过伪装成受信任用户的请求来利用受信任的网站进行攻击。
+３、防御措施
+　　　　CSRF是攻击者可以利用保存到cookie伪造用户发送请求，所以防御的关键是在请求中放入攻击者不可伪造的信息。
+ 
+　　　　Token验证：在http请求的头信息中增加一个Token字段，并在服务器端判断是否Token一致，通过校验携带的Token信息决定是否允许请求。
+　　　　Referer验证：　在HTTP头中有一个字段叫Referer，它记录了该HTTP请求的来源地址。如果Referer是可信任的网站来源，则允许，否则拒绝。（例如用户在登录某银行网站A.com后点击转账按钮发送转账请求，此时该请求的头信息的Referer就是有转账按钮的URL，服务器判断是否为银行网站的URL，是的话请求就合法，不是的话就可能是CSRF攻击，则拒绝请求。）
+XSS
+　　１、基本概念和缩写
+　　XSS攻击全称跨站脚本攻击，XSS是一种在web应用中的计算机安全漏洞，它允许恶意web用户将代码植入到提供给其它用户使用的页面中。
+３、防御措施
+ 　　　1、过滤：表单提交或者url参数传递前，对需要的参数进行过滤
+　　　2、转码（例如md5）、3、转化：有时不能对数据进行严格的过滤，那我们也需要对标签进行转换。（比如用户输入：<script>alert("222")</script>，保存后最终存储的会是&lt;script&gt;alert=&quot;222;&lt;/script&gt;在展现时浏览器会对这些字符转换成文本内容显示，而不是一段可执行的代码。）
+ 71、js中事件流的理解
+事件的概念：
+　　HTML中与javascript交互是通过事件驱动来实现的，例如鼠标点击事件、页面的滚动事件onscroll等等，可以向文档或者文档中的元素添加事件侦听器来预订事件。
+　　想要知道这些事件是在什么时候进行调用的，就需要了解一下“事件流”的概念。
+什么是事件流：
+　　1，DOM事件流，
+　　　　事件流包括三个阶段：
+　　　　1，事件捕获阶段。
+　　　　2，处于目标阶段。（当前事件阶段）
+　　　　3，事件冒泡阶段。
+https://www.cnblogs.com/st-leslie/p/5907556.html
+72、柯里化函数。
+// 普通的add函数
+function add(x, y) {
+    return x + y
+}
+// Currying柯里化后
+function curryingAdd(x) {
+    return function (y) {
+        return x + y
+    }
+}
+add(1, 2)           // 3
+curryingAdd(1)(2)   // 3
+链接：
+https://www.jianshu.com/p/2975c25e4d71
+73、一次完整的HTTP请求过程
+https://www.cnblogs.com/engeng/articles/5959335.html
+74、居中为什么用transform，而不是margin top/left
+transform
+transform 属于合成属性（composite property），对合成属性进行 transition/animation 动画将会创建一个合成层（composite layer），这使得被动画元素在一个独立的层中进行动画。通常情况下，浏览器会将一个层的内容先绘制进一个位图中，然后再作为纹理（texture）上传到 GPU，只要该层的内容不发生改变，就没必要进行重绘（repaint），浏览器会通过重新复合（recomposite）来形成一个新的帧。
+margin top / left
+top/left属于布局属性，该属性的变化会导致重排（reflow/relayout），所谓重排即指对这些节点以及受这些节点影响的其它节点，进行CSS计算->布局->重绘过程，浏览器需要为整个层进行重绘并重新上传到 GPU，造成了极大的性能开销。
+小总结
+Margin：对布局属性进行动画，浏览器需要为每一帧进行重绘并上传到 GPU transform：对合成属性进行动画，浏览器会为元素创建一个独立的复合层，当元素内容没有发生改变，该层就不会被重绘，浏览器会通过重新复合来创建动画帧
