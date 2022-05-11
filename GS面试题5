@@ -418,3 +418,23 @@ MIME的全称是Multipurpose Internet Mail Extensions，即多用途互联网邮
 常见MIME类型：
 application/octet-stream?未知的应用程序文件
 application/json?json数据
+text/plain未知的文本文件（纯文本文件），浏览器会认为这是可以直接显示的
+注:?浏览器分辨文件是基于MIME的，而不会把文件打开查看是否是其他类型，例如用link链接了一个标记为text/plain的文件，就算此文件是css文件，就算其后缀是.css,浏览器依旧不认
+text/css?css文件
+text/html?HTML文件
+image/gif?gif文件
+常见的还有image/jpeg、image/png、image/svg
+很多浏览器支持icon image/x-icon
+
+let和var的区别
+1）let是块作用域，var是函数作用域
+2）let没有变量声明提升，var有声明提升
+3）存在暂时性死区（TDZ），暂时性死区所指的问题基本都是 先声明后使用的问题
+4）在let声明变量所在的作用域，不能重复声明同名变量
+
+20.iterator的作用是什么，怎么布置iterator接口。
+1、统一数据结构（数组，对象，map，set，数组包对象，对象包数组）的遍历方式
+2、在数据结构上部署iterator接口:所谓的部署接口表现形式为，给对象或数组等集合增加iterator属性，属性的内容是一个根据iterator接口规范自行实现的方法
+21cookie和session的区别
+session是区别于数据库存在的一种服务器临时存储技术, 它主要存储一些无需持久化的数据, 比如临时的登录状态信息等
+cookie是存在于浏览器上的一种浏览器本地存储的方式, 同域名下的cookie不同标签页可以共享, 默认过期时间是浏览器关闭时, 而且在进行http请求时, 会自动带上浏览器全部的cookie发给后台, 后台也可以获取cookie, 设置可以在响应时, 想浏览器中设置cookie。
