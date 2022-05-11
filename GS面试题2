@@ -29,3 +29,175 @@ JSX -> createElement -> JS对象(虚拟DOM) -> 真实的DOM
 1、性能提升了
 2、它使得跨端应用得以实现，Ract Native
 React可以写原生应用了，得益于React中的虚拟DOM，如果没有虚拟DOM是不能写原生应用的。原生系统是不支持DOM不存在DOm这个概念的，但是支持虚拟DOM（虚拟DOM就是一个JS对象）；虚拟DOM可以在浏览器端被解析为真实的DOM，在原生端可以被解析原生所支持的组件等格式
+// 原型链继承关系
+    function fnArr(){
+        fnArr.prototype.name = '原型链名字'
+    }
+    var a = new fnArr()
+    console.log(a.name)
+    // a的隐性属性继承fnArr的显性属性，形成一条原型链
+    console.log(a.__proto__ === fnArr.prototype) //true
+
+    var obj = new Object();
+    obj.name = 'Kevin'
+    console.log(obj.name) // Kevin
+
+    // 原型链最终值为null
+    console.log(Object.prototype.__proto__ === null) // true
+
+    // JavaScript 默认并不会复制对象的属性，相反，JavaScript 只是在两个对象之间创建一个关联，这样，一个对象就可以通过委托访问另一个对象的属性和函数，所以与其叫继承，委托的说法反而更准确些
+50、原型链的解释
+    var person = function(){    
+        //变量作用域为函数内部，外部无法访问    
+        var name = "default";       
+        return {    
+        getName : function(){    
+            return name;    
+        },    
+        setName : function(newName){    
+            name = newName;    
+        }    
+        }    
+    }();    
+    console.log(person.name);//直接访问，结果为undefined    
+    console.log(person.getName());    //default
+    person.setName("a");    
+    console.log(person.getName());    //a
+51、vue 如何监听数组变化
+•	Object.defineProperty 不能监听数组变化
+•	重新定义原型，重写push pop 等方法，实现监听
+•	Proxy(代理) 可以原生支持监听数组变化
+52、eval( )是做什么的？
+它的功能是把对应的字符串解析成JS代码并运行；
+ 应该避免使用eval，不安全，非常耗性能（2次，一次解析成js语句，一次执行）。
+ 由JSON字符串转换为JSON对象的时候可以用eval，var obj =eval('('+ str +')');
+53、JavaScript的垃圾回收机制
+内存泄漏
+js的垃圾回收机制是为了防止内存泄漏而设计的，内存泄漏的含义就是某块内存不再被需要或无法被引用或引用链从根访问时，这块内存却还存在着。
+垃圾回收机制
+垃圾回收机制就是间歇性的不定期去寻找不再使用的变量，并释放掉它们所指向的内存。
+JavaScript中内存管理的主要概念就是可达性。
+简单地说，可达性 就是那种以某种方式可访问或可被引用的值，它们被保证存储在内存中。
+当然，如果引用或引用链可以从根访问到任何其他值，则会认为该值是可访问的。例如，如果局部变量中的 A 对象具有引用到 B 对象的属性，则 A,B 属性皆被视为具有可达性。
+但是有一组对象持有固有的可达值，所以就无法被回收删除，例如
+全局变量
+本地函数的局部变量和参数
+当前嵌套调用链上的其他函数的变量和参数
+还有其他的，内部的
+这些值统称为 根
+所以在js中不被引用的都是垃圾。但是如果几个对象互相引用，但是根无法访问，那么它们也是垃圾！
+下面是一些内存管理的例子
+最简单的例子
+let user = {
+  name: "John"
+};
+这里将一个键name值John的对象赋值给user
+如果user的值被覆盖，也就是引用丢失(比如将user = ‘name’)
+现在John就会变成不可达的状态，无法访问无法引用，垃圾回收器将丢弃John对象数据并释放内存
+4、垃圾回收策略：标记清除(较为常用)和引用计数。
+
+标记清除：
+
+　　定义和用法：当变量进入环境时，将变量标记"进入环境"，当变量离开环境时，标记为："离开环境"。某一个时刻，垃圾回收器会过滤掉环境中的变量，以及被环境变量引用的变量，剩下的就是被视为准备回收的变量。
+
+　　到目前为止，IE、Firefox、Opera、Chrome、Safari的js实现使用的都是标记清除的垃圾回收策略或类似的策略，只不过垃圾收集的时间间隔互不相同。
+
+引用计数：
+
+　　定义和用法：引用计数是跟踪记录每个值被引用的次数。
+
+　　基本原理：就是变量的引用次数，被引用一次则加1，当这个引用计数为0时，被视为准备回收的对象。
+54、清楚浮动的方法？
+1.父级div定义 height
+原理：父级div手动定义height，就解决了父级div无法自动获取到高度的问题。
+优点：简单、代码少、容易掌握
+缺点：只适合高度固定的布局，要给出精确的高度，如果高度和父级div不一样时，会产生问题
+2，结尾处加空div标签 clear:both
+原理：添加一个空div，利用css提高的clear:both清除浮动，让父级div能自动获取到高度
+优点：简单、代码少、浏览器支持好、不容易出现怪问题
+缺点：不少初学者不理解原理；如果页面浮动布局多，就要增加很多空div，让人感觉很不好
+3，父级div定义 伪类:after 和 zoom
+原理：IE8以上和非IE浏览器才支持:after，原理和方法2有点类似，zoom(IE转有属性)可解决ie6,ie7浮动问题
+优点：浏览器支持好、不容易出现怪问题（目前：大型网站都有使用，如：腾迅，网易，新浪等等）
+缺点：代码多、不少初学者不理解原理，要两句代码结合使用才能让主流浏览器都支持
+4，父级div定义 overflow:hidden
+原理：必须定义width或zoom:1，同时不能定义height，使用overflow:hidden时，浏览器会自动检查浮动区域的高度
+优点：简单、代码少、浏览器支持好
+缺点：不能和position配合使用，因为超出的尺寸的会被隐藏。
+55、介绍一下box-sizing属性
+兼容问题 
+首先，box-sizing属性在FireFox中存在兼容问题，所以需要使用-moz-box-sizing做一下兼容。
+
+属性值
+· box-sizing：content-box
+· box-sizing：border-box
+· box-sizing：inherit
+content-box
+实际宽度 = width + margin + padding
+· 这是box-sizing的默认属性值
+· 是CSS2.1中规定的宽度高度的显示行为
+· 在CSS中定义的宽度和高度就对应到元素的内容框
+· 在CSS中定义的宽度和高度之外绘制元素的内边距和边框
+
+border-box
+实际宽度 = width (margin + padding 会计算在内)
+· 在CSS中微元素设定的宽度和高度就决定了元素的边框盒
+· 即为元素在设置内边距和边框是在已经设定好的宽度和高度之内进行绘制
+· CSS中设定的宽度和高度减去边框和内间距才能得到元素内容所占的实际宽度和高度
+
+56、new操作符到底到了什么
+1. var Func=function(){  
+
+2. };  
+
+3. var func=new Func ();  
+
+new共经过了4几个阶段
+
+1、创建一个空对象
+
+[javascript] view plain copy
+
+1. varobj=new Object();  
+
+2、设置原型链
+
+[javascript] view plain copy
+
+1. obj.__proto__= Func.prototype;  
+3、让Func中的this指向obj，并执行Func的函数体。
+1. var result =Func.call(obj);  
+4、判断Func的返回值类型：
+如果是值类型，返回obj。如果是引用类型，就返回这个引用类型的对象。
+1. if (typeof(result) == "object"){  
+2.   func=result;  
+3. }  
+4. else{  
+5.     func=obj;;  
+6. }  
+57、类数组与数组的区别？
+类数组:
+1）拥有length属性，其它属性（索引）为非负整数（对象中的索引会被当做字符串来处理）;
+2）不具有数组所具有的方法；
+类数组是一个普通对象，而真实的数组是Array类型。
+常见的类数组有: 函数的参数 arugments, DOM 对象列表(比如通过 document.querySelectorAll 得到的列表), jQuery 对象 (比如 $("div")).
+类数组可以转换为数组:
+//第一种方法
+Array.prototype.slice.call(arrayLike, start);
+//第二种方法
+[...arrayLike];
+//第三种方法:
+Array.from(arrayLike);
+58、防抖和节流的区别是什么？防抖和节流的实现？
+防抖(debounce): n秒内函数只会执行一次，如果n秒内高频事件再次被触发，则重新计算时间
+防抖的应用场景:
+•	每次 resize/scroll 触发统计事件
+•	文本输入的验证（连续输入文字后发送 AJAX 请求进行验证，验证一次就好）
+节流(throttle): 高频事件在规定时间内只会执行一次，执行一次后，只有大于设定的执行周期后才会执行第二次。
+函数节流的应用场景有:
+•	DOM 元素的拖拽功能实现（mousemove）
+•	射击游戏的 mousedown/keydown 事件（单位时间只能发射一颗子弹）
+•	计算鼠标移动的距离（mousemove）
+•	Canvas 模拟画板功能（mousemove）
+•	搜索联想（keyup）
+•	监听滚动事件判断是否到页面底部自动加载更多：给 scroll 加了 debounce 后，只有用户停止滚动后，才会判断是否到了页面底部；如果是 throttle 的话，只要页面滚动就会间隔一段时间判断一次
