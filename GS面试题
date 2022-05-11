@@ -1,0 +1,78 @@
+如何判断一个 js 变量是数组类型 
+ES5:Array.isArray() 
+[] instanceof Array 
+Object.prototype.toString.call([]);//"[object Array]"
+var a = []
+console.log(Array.isArray(a))
+console.log(a instanceof Array)
+console.log(Object.prototype.toString.call(a))
+console.log(a.constructor==Array)
+异步任务中：先执行微任务再宏任务
+任务执行：除去同步任务优先，异步任务中：先执行微任务再宏任务
+New promise的.then()是微任务
+Setimeout宏任务
+宏任务和微任务的总结：
+宏任务 Macrotasks 就是参与了事件循环的异步任务。
+微任务 Microtasks 就是没有参与事件循环的“异步”任务。
+宏任务(macrotasks)和微任务(microtasks)？？包含什么？
+macrotasks: setTimeout, setInterval, setImmediate, I/O, UI rendering
+microtasks: process.nextTick, Promises, Object.observe(废弃), MutationObserver
+
+vue中watch深度监听
+name:{
+deep:true,//开启深度监听
+hander(){ //发生变化时触发该函数
+
+}
+}
+
+Vue导航守卫：router.beforEach可以实现前端鉴权
+
+Vue数据流为单向的，父 =》子，其中有个概念是v-model
+
+1、Link和@import引入样式区别？
+Link属于html，会同步加载，js可以动态改路径
+@import属于css，会最后加载，不兼容IE5下
+2、选择器
+id选择器 #header
+class选择器 .container
+伪类选择器 ::after/:hover
+属性选择器 [type='input']
+兄弟选择器 +
+后代选择器 >
+通配符 *
+3、BFC的特性（作用）
+1.	同属于一个BFC的两个块级盒子，在垂直方向上会发生margin重叠，给其中一个盒子放入另外一个BFC中，解决margin重叠。
+2.	浮动元素是一个单独的BFC。两个BFC之间不会影响，解决浮动元素浮在其它元素表面上的问题，一般用于图文环绕。
+3.	计算BFC的高度时，浮动元素也计算在内，给浮元素触发BFC，解决高度塌陷问题。
+4.	解决办法：
+给父级设置border或者padding
+改变父级元素bfc渲染模式
+position:absolution/fixed
+float:right/left
+overflow:hidden 
+display:inline-bloack
+
+4、简要描述下JS有哪些内置的对象
+•	时间对象Date
+•	字符串对象String
+•	数学对象Math
+•	数值对象Number
+•	数组对象Array
+•	函数对象Function
+•	函数参数集合arguments
+•	布尔对象Boolean
+•	错误对象Error
+•	基础对象Object
+
+5、::before和:after中单冒号和双冒号的区别是什么，这两个伪元素有什么作用？
+::是css3为了区分伪类和伪元素新增的
+::伪元素
+:伪类
+::before在元素内部的最开头添加元素或者content
+::after与之相反，在元素内部的最结尾
+<a class="demo" href="https://www.xunlei.com/" title="精彩，一下就有">精彩，一下就有</a>
+
+.demo:after{
+	content: "↗"
+}
