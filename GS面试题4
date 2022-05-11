@@ -1,0 +1,417 @@
+26、说说你对CDN的理解，使用过程中有没有遇到过问题？
+CDN，内容分发网络。
+具体来说，CDN就是采用更多的缓存服务器（CDN边缘节点），布放在用户访问相对集中的地区或网络中。当用户访问网站时，利用全局负载技术，将用户的访问指向距离最近的缓存服务器上，由缓存服务器响应用户请求。
+采用CDN技术，最大的好处，就是加速了网站的访问——用户与内容之间的物理距离缩短，用户的等待时间也得以缩短
+此外，CDN还有安全方面的好处。内容进行分发后，源服务器的IP被隐藏，受到攻击的概率会大幅下降。而且，当某个服务器故障时，系统会调用临近的健康服务器，进行服务，避免对用户造成影响。
+项目中使用过CDN，我们的图片和脚本都放在cdn上，这样用户访问这些资源会更快，因为这些资源在不同的域名下，会一定程度避免http1.1的队头堵塞。有的CDN采用http2，速度更快。
+有点不好就是：
+1.	大部分CDN是单独收费的。
+2.	CDN更新资源麻烦，可能需要手动来刷新CDN来刷新资源的缓存。
+3.	如果CDN出了故障，需要联系CDN提供商来解决，中间增加了沟通耗时。
+4.	可能对SEO有影响，CDN ip的多样性，部分ip可能对爬虫并不友好。
+27、什么是事件委托？它有什么好处？能简单的写一个例子吗？
+事件委托
+即利用事件冒泡机制处理指定一个事件处理程序，来管理某一类型的所有事件
+事件委托的作用
+1.	利用冒泡的原理，将事件加到父级身上，触发执行效果，这样只在内存中开辟一块空间，既节省资源又减少DOM操作，提高性能
+2.	可以为动态添加的元素绑定事件
+js实现事件委托的三大步骤：
+第一步：给父元素绑定事件
+给元素ul添加绑定事件，通过addEventListener为父元素绑定事件
+第二步：监听子元素的冒泡事件
+这里默认是冒泡，点击子元素li会向上冒泡
+第三步：找到是哪个子元素的事件
+通过匿名回调函数的参数e用来接收事件对象，通过target获取触发事件的目标
+
+28、
+cookie	localStorage	sessionStorage	indexDB
+的区别？			
+
+特性	cookie	localStorage	sessionStorage	indexDB
+数据生命周期	可以设置过期时间	除非被清理，否则一直存在	页面关闭就清理	除非被清理，否则一直存在
+数据存储大小	4k	5M	5M	不限
+与服务端通信	携带cookie	不参与	不参与	不参与
+29、知道IPV6是什么吗？说说它和IPV4的区别是什么？
+ipv6增加了海量的网络地址，使物联网成为可能。ipv4提供的2的32次方的地址根本不够无数的家用设备使用。而2的128次方的地址可为飞速增加的物联网设备提供足够的地址。如今到来的5G时代，ipv6在底层上可谓功不可没。
+
+30、vue中为什么避免 v-if 和 v-for 用在一起？
+文档中明确指出永远不要把 v-if 和 v-for 同时用在同一个元素上，显然这是一个重要的注意事项。
+当 Vue 处理指令时，v-for 比 v-if 具有更高的优先级，这意味着 v-if 将分别重复运行于每个 v-for 循环中。
+通过 v-if 移动到容器元素，可以避免重复遍历列表中的每个值。同时我们只检查它一次，且不会在 v-if 为否 的时候运算 v-for。
+31、Vue 的双向数据绑定的原理是什么
+当你把一个普通的 JavaScript 对象传给 Vue 实例的 data 选项，Vue 将遍历此对象所有的属性，并使用 Object.defineProperty 把这些属性全部加上set和get访问器，这样在设置data的属性值的时候，会触发set方法，那么set方法主要有两个作用，一是改变data里面的属性值，二是发出数据变化的通知。Observer作为数据的观察者，让数据对象的读写操作都处于自己的监管之下，Dep作为Watcher(订阅器)的收集者，当数据发生变化set会发出通知，会被Observer观察到，然后由Dep通知到Watcher，最后更新视图。
+3．实现数据绑定的方式大致有以下几种：
+- 1、发布者-订阅者模式（backbone.js）
+- 2、脏值检查（angular.js）
+- 3、数据劫持（vue.js)
+脏值检查
+angular是通过脏值检查方式来对比数据是否变化，来决定是否更新视图，最常见的方式是通过setInterval()来监测数据变化，当然，只会在某些指定事件触发时下才进行脏值检查。大致如下：
+- DOM事件，譬如用户输入文本，点击按钮等。( ng-click )
+- XHR响应事件 ( $http )
+- 浏览器Location变更事件 ( $location )
+- Timer事件( $timeout , $interval )
+- 执行 $digest() 或 $apply()
+数据劫持
+Vue.js则是通过数据劫持以及结合发布者-订阅者来实现的，数据劫持是利用ES5的Object.defineProperty(obj, key, val)来劫持各个属性的的setter以及getter，在数据变动时发布消息给订阅者，从而触发相应的回调来更新视图。
+一、实现最基础的数据绑定
+    <input type="text" id="in"/>
+    输入的值为：<span id="out"></span>
+
+    <script>
+        var int = document.getElementById('in');
+        var out = document.getElementById('out');
+        var obj = {};
+
+        Object.defineProperty(obj, 'msg', {
+            enumerable: true,
+            configurable: true,
+            set (newVal) {
+                out.innerHTML = newVal;
+            }
+        })
+
+        int.addEventListener('input', function(e) {
+            obj.msg = e.target.value;
+        })
+    </script>
+初探 Vue3.0 中的一大亮点——Proxy(拦截、过滤) !
+这将会消除了之前 Vue2.x 中基于 Object.defineProperty 的实现所存在的很多限制：无法监听 属性的添加和删除、数组索引和长度的变更，并可以支持 Map、Set、WeakMap 和 WeakSet！速度是 Object.defineProperty的一倍，节约一般的内存开销
+缺点：它属于ES6中的原生方法，存在低版本浏览器不兼容的情况
+其实就是在对目标对象的操作之前提供了拦截，可以对外界的操作进行过滤和改写，修改某些操作的默认行为，这样我们可以不直接操作对象本身，而是通过操作对象的代理对象来间接来操作对象，达到预期的目的~
+<!--html-->
+<div id="app">
+    <h3 id="paragraph"></h3>
+    <input type="text" id="input"/>
+</div>
+主要还是得看逻辑部分：
+//获取段落的节点
+const paragraph = document.getElementById('paragraph');
+//获取输入框节点
+const input = document.getElementById('input');
+    
+//需要代理的数据对象
+const data = {
+    text: 'hello world'
+}
+
+const handler = {
+    //监控 data 中的 text 属性变化
+    set: function (target, prop, value) {
+        if ( prop === 'text' ) {
+                //更新值
+                target[prop] = value;
+                //更新视图
+                paragraph.innerHTML = value;
+                input.value = value;
+                return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+//添加input监听事件
+input.addEventListener('input', function (e) {
+    myText.text = e.target.value;   //更新 myText 的值
+}, false)
+
+//构造 proxy 对象
+const myText = new Proxy(data,handler);
+
+//初始化值
+myText.text = data.text;    
+
+32、vue中key值的作用是什么？
+使用 key 来给每个节点做一个唯一标识，Diff 算法就可以正确的识别此节点，找到正确的位置区插入新的节点。这样可以更高效的更新虚拟 DOM。
+同时也说明了更新是最好不要使用index作为key值，而要使用一个全局都唯一的值
+1.	key的作用主要是为了更高效的更新虚拟DOM。
+2.	vue在patch过程中判断两个节点是否是相同节点是key是一个必要条件，渲染一组列表时，key往往是唯一标识，所以如果不定义key的话，vue只能认为比较的两个节点是同一个，哪怕它们实际上不是，这导致了频繁更新元素，使得整个patch过程比较低效，影响性能。
+3.	实际使用中在渲染一组列表时key必须设置，而且必须是唯一标识，应该避免使用数组索引作为key，这可能导致一些隐蔽的bug；vue中在使用相同标签元素过渡切换时，也会使用key属性，其目的也是为了让vue可以区分它们，否则vue只会替换其内部属性而不会触发过渡效果。
+4.	从源码中可以知道，vue判断两个节点是否相同时主要判断两者的key和元素类型等，因此如果不设置key，它的值就是undefined，则可能永远认为这是两个相同节点，只能去做更新操作，这造成了大量的dom更新操作，明显是不可取的。
+
+33、简要概述nextTick实现原理
+来自官网的描述：
+在下次 DOM 更新循环结束之后执行延迟回调。在修改数据之后立即使用这个方法，获取更新后的 DOM。
+nextTick应用场景
+你在Vue生命周期的created()钩子函数进行的DOM操作一定要放在Vue.nextTick()的回调函数中。原因是什么呢，原因是在created()钩子函数执行的时候DOM 其实并未进行任何渲染，而此时进行DOM操作无异于徒劳，所以此处一定要将DOM操作的js代码放进Vue.nextTick()的回调函数中。与之对应的就是mounted钩子函数，因为该钩子函数执行时所有的DOM挂载和渲染都已完成，此时在该钩子函数中进行任何DOM操作都不会有问题 。
+34、Vue实例为什么只能有一个根元素?
+简要概述：
+通过这个‘根元素’，来递归遍历整个vue‘树’下的所有节点，并处理为vdom，最后再渲染成真正的HTML，插入在正确的位置
+因为在Vue源码中，通过querySelector函数获取页面中的元素，但是querySelector函数本身仅仅返回匹配指定选择器的第一个元素，所以这就解释了为什么第二个div会原封不动。
+Vue其实并不知道哪一个才是我们的入口，因为对于一个入口来讲，这个入口就是一个Vue类，Vue需要把这个入口里面的所有东西拿来渲染、处理，最后再重新插入到dom中。如果同时设置了多个入口，那么vue就不知道哪一个才是这个类。
+其实这个问题归结到最后，也可以抽象为一个问题：为什么抽象出来的 DOM 树只能有一个根？
+1.	从查找和遍历的角度来说，如果有多个根，那么我们的查找和遍历的效率会很低。
+2.	如果一个树有多个根，说明可以优化，肯定会有一个节点是可以访问到所有的节点，那这个节点就会成为新的根节点。
+3.	再从 Vue 本身来说，如果说一个组件有多个入口多个根，那不就意味着你的组件还可以进一步拆分成多个组件，进一步组件化，降低代码之间的耦合程度。
+35、Vue的computed和watch的区别是什么？
+Computed会缓存计算结果，不能计算data中定义过的变量，watch不会缓存结果，且只能计算data中定义的变量.
+
+36、为什么vue中data必须是一个函数？
+对象为引用类型，当重用组件时，由于数据对象都指向同一个data对象，当在一个组件中修改data时，其他重用的组件中的data会同时被修改；而使用返回对象的函数，由于每次返回的都是一个新对象（Object的实例），引用地址不同，则不会出现这个问题。
+
+37、active-class是哪个组件的属性？
+vue-router模块的router-link组件。
+
+VueX5种属性：State,mutation,getter,action,module
+38、<keep-alive></keep-alive>的作用是什么？
+<keep-alive></keep-alive> 包裹动态组件时，会缓存不活动的组件实例,主要用于保留组件状态或避免重新渲染。 大白话: 比如有一个列表和一个详情，那么用户就会经常执行打开详情=>返回列表=>打开详情…这样的话列表和详情都是一个频率很高的页面，那么就可以对列表组件使用<keep-alive></keep-alive>进行缓存，这样用户每次返回列表的时候，都能从缓存中快速渲染，而不是重新渲染
+
+
+
+39、delete和Vue.delete删除数组的区别？
+delete只是被删除的元素变成了 empty/undefined 其他的元素的键值还是不变。 Vue.delete直接删除了数组 改变了数组的键值。
+40、v-on 常用修饰符
+.stop 该修饰符将阻止事件向上冒泡。同理于调用 event.stopPropagation() 方法
+.prevent 该修饰符会阻止当前事件的默认行为。同理于调用 event.preventDefault() 方法
+.self 该指令只当事件是从事件绑定的元素本身触发时才触发回调
+.once 该修饰符表示绑定的事件只会被触发一次
+41、v-for key的作用。
+key 的特殊属性主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试修复/再利用相同类型元素的算法。使用 key，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+42、axios的特点有哪些？
+1、axios是一个基于promise的HTTP库，支持promise的所有API；
+2、它可以拦截请求和响应；
+3、它可以转换请求数据和响应数据，并对响应回来的内容自动转为json类型的数据；
+4、它安全性更高，客户端支持防御XSRF；
+
+43、vue中的 ref 是什么？
+ref 被用来给元素或子组件注册引用信息。引用信息将会注册在父组件的 $refs 对象上。如果在普通的 DOM 元素上使用，引用指向的就是 DOM 元素；如果用在子组件上，引用就指向组件实例
+44、$route和$router的区别？
+$route是“路由信息对象”，包括path，params，hash，query，fullPath，matched，name等路由信息参数。
+$router是’路由实例’对象包括了路由的跳转方法，钩子函数等。
+45、如何优化SPA应用的首屏加载速度慢的问题？
+将公用的JS库通过script标签外部引入，减小 app.bundel 的大小，让浏览器并行下载资源文件，提高下载速度；
+在配置 路由时，页面和组件使用懒加载的方式引入，进一步缩小 app.bundel 的体积，在调用 某个组件时再加载对应的js文件；
+加一个首屏loading图，提升用户体验；
+45、vue-router共有几种模式，有什么区别？
+● hash: 使用 URL hash 值来作路由。默认模式。
+● history: 依赖 HTML5 History API 和服务器配置。查看 HTML5 History 模式。
+● abstract: 支持所有 JavaScript 运行环境，如 Node.js 服务器端。
+46、单页面应用和多页面应用区别及优缺点
+1.	单页面的优点：
+2.	一个外壳页面和多个页面片段组成
+用户体验好，快，内容的改变不需要重新加载整个页面，基于这一点spa对服务器压力较小
+前后端分离
+资源共用(css,js)
+页面效果会比较炫酷（比如切换页面内容时的专场动画）
+2.单页面缺点：
+不利于seo
+导航不可用，如果一定要导航需要自行实现前进、后退。（由于是单页面不能用浏览器的前进后退功能，所以需要自己建立堆栈管理）
+初次加载时耗时多
+页面复杂度提高很多
+前端路由：每跳转到不同的URL都是使用前端的锚点路由，实际上只是JS根据URL来操作DOM元素，根据每个页面需要的去服务端请求数据，返回数据后和模板进行组合，当然模板有可能是请求服务端返回的，这就是 SPA 单页程序。
+在js可以通过window.location.hash读取到路径加以解析之后就可以响应不同路径的逻辑处理。
+history 是 HTML5 才有的新 API，可以用来操作浏览器的 session history (会话历史)。基于 history 来实现的路由可以和最初的例子中提到的路径规则一样。
+H5还新增了一个hashchange事件，也是很有用途的一个新事件：
+当页面hash(#)变化时，即会触发hashchange。锚点Hash起到引导浏览器将这次记录推入历史记录栈顶的作用，window.location对象处理“#”的改变并不会重新加载页面，而是将之当成新页面，放入历史栈里。并且，当前进或者后退或者触发hashchange事件时，我们可以在对应的事件处理函数中注册ajax等操作！
+但是hashchange这个事件不是每个浏览器都有，低级浏览器需要用轮询检测URL是否在变化，来检测锚点的变化。当锚点内容(location.hash)被操作时，如果锚点内容发生改变浏览器才会将其放入历史栈中，如果锚点内容没发生变化，历史栈并不会增加，并且也不会触发hashchange事件。
+47、vue-router实现原理
+1.vue的单页面应用是基于路由和组件的，路由用于设定访问路径，并将路径和组件映射起来
+2.传统的页面应用，是用一些超链接来实现页面切换和跳转的。
+在vue-router单页面应用中，则是路径之间的切换，也就是组件的切换。路由模块的本质 就是建立起url和页面之间的映射关系。
+至于为啥不能用a标签，这是因为用Vue做的都是单页应用，就相当于只有一个主的index.html页面，所以你写的标签是不起作用的，必须使用vue-router来进行管理。
+48、详述虚拟DOM
+1、state数据
+2、JSX模板
+3、数据 + 模板 生成虚拟DOM(虚拟DOM就是一个JS对象，用它来描述真实DOM)（损耗一点性能）
+虚拟DOM：['div’, {id: 'abc’}, ['span’, '’, ‘hello world’]]
+4、用虚拟DOM的结构生成真实的DOM -> 视图显示
+真实DOM：
+5、state发生了变化
+6、数据 + 模板 生成新的虚拟DOM：['div’, {id: 'abc’}, ['span’, '’, ‘hi world’]]（极大提升性能）
+7、比较原始虚拟DOM和新的虚拟DOM的区别，找到的区别是span中的内容发生了变化（极大提升了性能）
+8、直接操作DOM，改变span中的内容
+总结：
+减少了真实DOM的创建及对比，创建都是JS对象，对比的也都是JS的对象，在JS底层实现了极大的性能飞越
+组件生成流程：
+JSX -> JS对象(虚拟DOM) -> 真实的DOM
+用React.createElement改写JSX模板：
+JSX：return
+{ item }
+
+JSX -> JS对象(虚拟DOM) -> 真实的DOM
+React.createElement('div’, {}, React.createElement('span’, {}, ‘item’))
+JSX -> createElement -> JS对象(虚拟DOM) -> 真实的DOM
+虚拟DOM优点：
+1、性能提升了
+2、它使得跨端应用得以实现，Ract Native
+React可以写原生应用了，得益于React中的虚拟DOM，如果没有虚拟DOM是不能写原生应用的。原生系统是不支持DOM不存在DOm这个概念的，但是支持虚拟DOM（虚拟DOM就是一个JS对象）；虚拟DOM可以在浏览器端被解析为真实的DOM，在原生端可以被解析原生所支持的组件等格式
+49、原型链的解释
+ 
+// 原型链继承关系
+    function fnArr(){
+        fnArr.prototype.name = '原型链名字'
+    }
+    var a = new fnArr()
+    console.log(a.name)
+    // a的隐性属性继承fnArr的显性属性，形成一条原型链
+    console.log(a.__proto__ === fnArr.prototype) //true
+
+    var obj = new Object();
+    obj.name = 'Kevin'
+    console.log(obj.name) // Kevin
+
+    // 原型链最终值为null
+    console.log(Object.prototype.__proto__ === null) // true
+
+    // JavaScript 默认并不会复制对象的属性，相反，JavaScript 只是在两个对象之间创建一个关联，这样，一个对象就可以通过委托访问另一个对象的属性和函数，所以与其叫继承，委托的说法反而更准确些
+50、原型链的解释
+    var person = function(){    
+        //变量作用域为函数内部，外部无法访问    
+        var name = "default";       
+        return {    
+        getName : function(){    
+            return name;    
+        },    
+        setName : function(newName){    
+            name = newName;    
+        }    
+        }    
+    }();    
+    console.log(person.name);//直接访问，结果为undefined    
+    console.log(person.getName());    //default
+    person.setName("a");    
+    console.log(person.getName());    //a
+51、vue 如何监听数组变化
+•	Object.defineProperty 不能监听数组变化
+•	重新定义原型，重写push pop 等方法，实现监听
+•	Proxy(代理) 可以原生支持监听数组变化
+52、eval( )是做什么的？
+它的功能是把对应的字符串解析成JS代码并运行；
+ 应该避免使用eval，不安全，非常耗性能（2次，一次解析成js语句，一次执行）。
+ 由JSON字符串转换为JSON对象的时候可以用eval，var obj =eval('('+ str +')');
+53、JavaScript的垃圾回收机制
+内存泄漏
+js的垃圾回收机制是为了防止内存泄漏而设计的，内存泄漏的含义就是某块内存不再被需要或无法被引用或引用链从根访问时，这块内存却还存在着。
+垃圾回收机制
+垃圾回收机制就是间歇性的不定期去寻找不再使用的变量，并释放掉它们所指向的内存。
+JavaScript中内存管理的主要概念就是可达性。
+简单地说，可达性 就是那种以某种方式可访问或可被引用的值，它们被保证存储在内存中。
+当然，如果引用或引用链可以从根访问到任何其他值，则会认为该值是可访问的。例如，如果局部变量中的 A 对象具有引用到 B 对象的属性，则 A,B 属性皆被视为具有可达性。
+但是有一组对象持有固有的可达值，所以就无法被回收删除，例如
+全局变量
+本地函数的局部变量和参数
+当前嵌套调用链上的其他函数的变量和参数
+还有其他的，内部的
+这些值统称为 根
+所以在js中不被引用的都是垃圾。但是如果几个对象互相引用，但是根无法访问，那么它们也是垃圾！
+下面是一些内存管理的例子
+最简单的例子
+let user = {
+  name: "John"
+};
+这里将一个键name值John的对象赋值给user
+如果user的值被覆盖，也就是引用丢失(比如将user = ‘name’)
+现在John就会变成不可达的状态，无法访问无法引用，垃圾回收器将丢弃John对象数据并释放内存
+4、垃圾回收策略：标记清除(较为常用)和引用计数。
+
+标记清除：
+
+　　定义和用法：当变量进入环境时，将变量标记"进入环境"，当变量离开环境时，标记为："离开环境"。某一个时刻，垃圾回收器会过滤掉环境中的变量，以及被环境变量引用的变量，剩下的就是被视为准备回收的变量。
+
+　　到目前为止，IE、Firefox、Opera、Chrome、Safari的js实现使用的都是标记清除的垃圾回收策略或类似的策略，只不过垃圾收集的时间间隔互不相同。
+
+引用计数：
+
+　　定义和用法：引用计数是跟踪记录每个值被引用的次数。
+
+　　基本原理：就是变量的引用次数，被引用一次则加1，当这个引用计数为0时，被视为准备回收的对象。
+54、清楚浮动的方法？
+1.父级div定义 height
+原理：父级div手动定义height，就解决了父级div无法自动获取到高度的问题。
+优点：简单、代码少、容易掌握
+缺点：只适合高度固定的布局，要给出精确的高度，如果高度和父级div不一样时，会产生问题
+2，结尾处加空div标签 clear:both
+原理：添加一个空div，利用css提高的clear:both清除浮动，让父级div能自动获取到高度
+优点：简单、代码少、浏览器支持好、不容易出现怪问题
+缺点：不少初学者不理解原理；如果页面浮动布局多，就要增加很多空div，让人感觉很不好
+3，父级div定义 伪类:after 和 zoom
+原理：IE8以上和非IE浏览器才支持:after，原理和方法2有点类似，zoom(IE转有属性)可解决ie6,ie7浮动问题
+优点：浏览器支持好、不容易出现怪问题（目前：大型网站都有使用，如：腾迅，网易，新浪等等）
+缺点：代码多、不少初学者不理解原理，要两句代码结合使用才能让主流浏览器都支持
+4，父级div定义 overflow:hidden
+原理：必须定义width或zoom:1，同时不能定义height，使用overflow:hidden时，浏览器会自动检查浮动区域的高度
+优点：简单、代码少、浏览器支持好
+缺点：不能和position配合使用，因为超出的尺寸的会被隐藏。
+55、介绍一下box-sizing属性
+兼容问题 
+首先，box-sizing属性在FireFox中存在兼容问题，所以需要使用-moz-box-sizing做一下兼容。
+
+属性值
+· box-sizing：content-box
+· box-sizing：border-box
+· box-sizing：inherit
+content-box
+实际宽度 = width + margin + padding
+· 这是box-sizing的默认属性值
+· 是CSS2.1中规定的宽度高度的显示行为
+· 在CSS中定义的宽度和高度就对应到元素的内容框
+· 在CSS中定义的宽度和高度之外绘制元素的内边距和边框
+
+border-box
+实际宽度 = width (margin + padding 会计算在内)
+· 在CSS中微元素设定的宽度和高度就决定了元素的边框盒
+· 即为元素在设置内边距和边框是在已经设定好的宽度和高度之内进行绘制
+· CSS中设定的宽度和高度减去边框和内间距才能得到元素内容所占的实际宽度和高度
+
+56、new操作符到底到了什么
+1. var Func=function(){  
+
+2. };  
+
+3. var func=new Func ();  
+
+new共经过了4几个阶段
+
+1、创建一个空对象
+
+[javascript] view plain copy
+
+1. varobj=new Object();  
+
+2、设置原型链
+
+[javascript] view plain copy
+
+1. obj.__proto__= Func.prototype;  
+3、让Func中的this指向obj，并执行Func的函数体。
+1. var result =Func.call(obj);  
+4、判断Func的返回值类型：
+如果是值类型，返回obj。如果是引用类型，就返回这个引用类型的对象。
+1. if (typeof(result) == "object"){  
+2.   func=result;  
+3. }  
+4. else{  
+5.     func=obj;;  
+6. }  
+57、类数组与数组的区别？
+类数组:
+1）拥有length属性，其它属性（索引）为非负整数（对象中的索引会被当做字符串来处理）;
+2）不具有数组所具有的方法；
+类数组是一个普通对象，而真实的数组是Array类型。
+常见的类数组有: 函数的参数 arugments, DOM 对象列表(比如通过 document.querySelectorAll 得到的列表), jQuery 对象 (比如 $("div")).
+类数组可以转换为数组:
+//第一种方法
+Array.prototype.slice.call(arrayLike, start);
+//第二种方法
+[...arrayLike];
+//第三种方法:
+Array.from(arrayLike);
+58、防抖和节流的区别是什么？防抖和节流的实现？
+防抖(debounce): n秒内函数只会执行一次，如果n秒内高频事件再次被触发，则重新计算时间
+防抖的应用场景:
+•	每次 resize/scroll 触发统计事件
+•	文本输入的验证（连续输入文字后发送 AJAX 请求进行验证，验证一次就好）
+节流(throttle): 高频事件在规定时间内只会执行一次，执行一次后，只有大于设定的执行周期后才会执行第二次。
+函数节流的应用场景有:
+•	DOM 元素的拖拽功能实现（mousemove）
+•	射击游戏的 mousedown/keydown 事件（单位时间只能发射一颗子弹）
+•	计算鼠标移动的距离（mousemove）
+•	Canvas 模拟画板功能（mousemove）
+•	搜索联想（keyup）
+•	监听滚动事件判断是否到页面底部自动加载更多：给 scroll 加了 debounce 后，只有用户停止滚动后，才会判断是否到了页面底部；如果是 throttle 的话，只要页面滚动就会间隔一段时间判断一次
+59、为什么0.1+0.2 ！= 0.3？
+是因为在进制转换和进阶运算的过程中出现精度损失
+1.进制转换
+0.1和0.2转换成二进制后会无限循环
+0.1 -> 0.0001100110011001...(无限循环)
+0.2 -> 0.0011001100110011...(无限循环)
