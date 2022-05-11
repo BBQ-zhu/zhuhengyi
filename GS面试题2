@@ -377,3 +377,66 @@ HTTP头中的Expires和Cache-Control就是完成这个事情的。
 68、MVC和MVVM的区别
   MVVM即Model-View-ViewModel的简写。即模型-视图-视图模型。模型（Model）指的是后端传递的数据。视图(View)指的是所看到的页面。视图模型(ViewModel)是mvvm模式的核心，它是连接view和model的桥梁。它有两个方向：一是将模型（Model）转化成视图(View)，即将后端传递的数据转化成所看到的页面。实现的方式是：数据绑定。二是将视图(View)转化成模型(Model)，即将所看到的页面转化成后端的数据。实现的方式是：DOM 事件监听。这两个方向都实现的，我们称之为数据的双向绑定。
       MVC是Model-View- Controller的简写。即模型-视图-控制器。M和V指的意思和MVVM中的M和V意思一样。C即Controller指的是页面业务逻辑。使用MVC的目的就是将M和V的代码分离。MVC是单向通信。也就是View跟Model，必须通过Controller来承上启下。MVC和MVVM的区别并不是VM完全取代了C，只是在MVC的基础上增加了一层VM，只不过是弱化了C的概念，ViewModel存在目的在于抽离Controller中展示的业务逻辑，而不是替代Controller，其它视图操作业务等还是应该放在Controller中实现。也就是说MVVM实现的是业务逻辑组件的重用，使开发更高效，结构更清晰，增加代码的复用性。
+69、this指针
+借助阮一峰老师的话：它代表函数运行时，自动生成的一个内部对象，只能在函数内部使用。这句话看似平常，可是要非常注意三个字：“运行时”，这说明this关键字只与函数的执行环境有关，而与声明环境没有关系。也就是这个this到底代表的是什么对象要等到函数运行时才知道，有点类似函数定义时的参数列表只在函数调用时才传入真正的对象。理解了这一点对后面this关键字规律的掌握有很大帮助。
+
+     this关键字虽然会根据环境变化，但是它始终指向的是调用当前函数的那个对象。这就引出了JS中函数调用的问题。在JS中调用函数的模式可以分为4种：方法调用模式、函数调用模式、构造器调用模式、apply调用模式。这些模式在如何初始化关键参数this上存在差异。
+70、web安全CSRF和XSS、didos攻击 
+CSRF
+１、基本概念和缩写
+CSRF（Cross-site request forgery）跨站请求伪造，是通过伪装成受信任用户的请求来利用受信任的网站进行攻击。
+３、防御措施
+　　　　CSRF是攻击者可以利用保存到cookie伪造用户发送请求，所以防御的关键是在请求中放入攻击者不可伪造的信息。
+ 
+　　　　Token验证：在http请求的头信息中增加一个Token字段，并在服务器端判断是否Token一致，通过校验携带的Token信息决定是否允许请求。
+　　　　Referer验证：　在HTTP头中有一个字段叫Referer，它记录了该HTTP请求的来源地址。如果Referer是可信任的网站来源，则允许，否则拒绝。（例如用户在登录某银行网站A.com后点击转账按钮发送转账请求，此时该请求的头信息的Referer就是有转账按钮的URL，服务器判断是否为银行网站的URL，是的话请求就合法，不是的话就可能是CSRF攻击，则拒绝请求。）
+IP白名单:等等方法
+XSS
+　　１、基本概念和缩写
+　　XSS攻击全称跨站脚本攻击，XSS是一种在web应用中的计算机安全漏洞，它允许恶意web用户将代码植入到提供给其它用户使用的页面中。
+３、防御措施
+ 　　　1、过滤：表单提交或者url参数传递前，对需要的参数进行过滤
+　　　2、转码（例如md5）、3、转化：有时不能对数据进行严格的过滤，那我们也需要对标签进行转换。（比如用户输入：<script>alert("222")</script>，保存后最终存储的会是&lt;script&gt;alert=&quot;222;&lt;/script&gt;在展现时浏览器会对这些字符转换成文本内容显示，而不是一段可执行的代码。）
+ 71、js中事件流的理解
+事件的概念：
+　　HTML中与javascript交互是通过事件驱动来实现的，例如鼠标点击事件、页面的滚动事件onscroll等等，可以向文档或者文档中的元素添加事件侦听器来预订事件。
+　　想要知道这些事件是在什么时候进行调用的，就需要了解一下“事件流”的概念。
+什么是事件流：
+　　1，DOM事件流，
+　　　　事件流包括三个阶段：
+　　　　1，事件捕获阶段。
+　　　　2，处于目标阶段。（当前事件阶段）
+　　　　3，事件冒泡阶段。
+https://www.cnblogs.com/st-leslie/p/5907556.html
+72、柯里化函数。
+// 普通的add函数
+function add(x, y) {
+    return x + y
+}
+// Currying柯里化后
+function curryingAdd(x) {
+    return function (y) {
+        return x + y
+    }
+}
+add(1, 2)           // 3
+curryingAdd(1)(2)   // 3
+链接：
+https://www.jianshu.com/p/2975c25e4d71
+73、一次完整的HTTP请求过程
+https://www.cnblogs.com/engeng/articles/5959335.html
+74、居中为什么用transform，而不是margin top/left
+transform
+transform 属于合成属性（composite property），对合成属性进行 transition/animation 动画将会创建一个合成层（composite layer），这使得被动画元素在一个独立的层中进行动画。通常情况下，浏览器会将一个层的内容先绘制进一个位图中，然后再作为纹理（texture）上传到 GPU，只要该层的内容不发生改变，就没必要进行重绘（repaint），浏览器会通过重新复合（recomposite）来形成一个新的帧。
+margin top / left
+top/left属于布局属性，该属性的变化会导致重排（reflow/relayout），所谓重排即指对这些节点以及受这些节点影响的其它节点，进行CSS计算->布局->重绘过程，浏览器需要为整个层进行重绘并重新上传到 GPU，造成了极大的性能开销。
+小总结
+Margin：对布局属性进行动画，浏览器需要为每一帧进行重绘并上传到 GPU transform：对合成属性进行动画，浏览器会为元素创建一个独立的复合层，当元素内容没有发生改变，该层就不会被重绘，浏览器会通过重新复合来创建动画帧
+75、visibility: hidden与display: none（类似vue中v-show与v-if）
+visibility: hidden ---- 将元素隐藏，但是在网页中该占的位置还是占着。
+display: none ---- 将元素的显示设为无，即在网页中不占任何的位置。
+76、v-if、v-show、v-html的原理是什么？
+v-if会调用addIfCondition方法，生成vnode的时候会忽略对应节点，render的时候就不会渲染；
+v-show会生成vnode，render的时候也会渲染成真实节点，只是在render过程中会在节点的属性中修改show属性值，也就是常说的display；
+v-html会先移除节点下的所有节点，调用html方法，通过addProp添加innerHTML属性，归根结底还是设置innerHTML为v-html的值
+所以在使用v-html的时候可能会存在XSS攻击的漏洞，被植入可执行的脚本
