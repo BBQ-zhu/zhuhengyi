@@ -226,3 +226,195 @@ margin top / left
 top/left属于布局属性，该属性的变化会导致重排（reflow/relayout），所谓重排即指对这些节点以及受这些节点影响的其它节点，进行CSS计算->布局->重绘过程，浏览器需要为整个层进行重绘并重新上传到 GPU，造成了极大的性能开销。
 小总结
 Margin：对布局属性进行动画，浏览器需要为每一帧进行重绘并上传到 GPU transform：对合成属性进行动画，浏览器会为元素创建一个独立的复合层，当元素内容没有发生改变，该层就不会被重绘，浏览器会通过重新复合来创建动画帧
+75、visibility: hidden与display: none（类似vue中v-show与v-if）
+visibility: hidden ---- 将元素隐藏，但是在网页中该占的位置还是占着。
+display: none ---- 将元素的显示设为无，即在网页中不占任何的位置。
+76、v-if、v-show、v-html的原理是什么？
+v-if会调用addIfCondition方法，生成vnode的时候会忽略对应节点，render的时候就不会渲染；
+v-show会生成vnode，render的时候也会渲染成真实节点，只是在render过程中会在节点的属性中修改show属性值，也就是常说的display；
+v-html会先移除节点下的所有节点，调用html方法，通过addProp添加innerHTML属性，归根结底还是设置innerHTML为v-html的值
+所以在使用v-html的时候可能会存在XSS攻击的漏洞，被植入可执行的脚本
+77、vue核心面试题：组件中的data为什么是一个函数
+1.vue中组件是用来复用的，为了防止data复用，将其定义为函数。
+2.vue组件中的data数据都应该是相互隔离，互不影响的，组件每复用一次，data数据就应该被复制一次，之后，当某一处复用的地方组件内data数据被改变时，其他复用地方组件的data数据不受影响，就需要通过data函数返回一个对象作为组件的状态。
+3.当我们将组件中的data写成一个函数，数据以函数返回值形式定义，这样每复用一次组件，就会返回一份新的data，拥有自己的作用域，类似于给每个组件实例创建一个私有的数据空间，让各个组件实例维护各自的数据。
+4.当我们组件的date单纯的写成对象形式，这些实例用的是同一个构造函数，由于JavaScript的特性所导致，所有的组件实例共用了一个data，就会造成一个变了全都会变的结果。
+78、vue中v-model与.sync修饰符的使用差异
+https://blog.csdn.net/qq_36209248/article/details/104020954
+
+两者的本质都是语法糖，目的都是实现组件与外部数据的双向绑定。v-model 是 .sync的一种体现（prop是value，vm.$emit('update:input')）。.sync 比较灵活，v-model比较单一。
+
+v-model能在像单选框、复选框等类型的输入控件中实现双向绑定，但是如果它使用在一个组件上，就无法实现双向绑定，因为从它的本质上看，它就是绑定value值，监听input事件，通过event拿到新的value并赋值给value。
+
+总的来说，v-model倾向于“value”，是组件最终的操作结果。.sync倾向于“change”，它是父组件获取子组件状态的一种快捷方式，否则我们很可能需要用事件来判断子组件状态。是一种update操作。
+79、你了解vue中的diff算法吗？
+1.	diff算法是虚拟DOM技术的产物，vue里面实际叫做patch，它的核心实现来自于snabbdom；通过新旧虚拟DOM作对比（即patch），将变化的地方转换为DOM操作
+2.	在vue 1中是没有patch的，因为界面中每个依赖都有专门的watcher负责更新，这样项目规模变大就会成为性能瓶颈，vue 2中为了降低watcher粒度，每个组件只有一个watcher，但是当需要更新的时候，怎样才能精确找到发生变化的地方？这就需要引入patch才行。
+3.	组件中数据发生变化时，对应的watcher会通知更新并执行其更新函数，它会执行渲染函数获取全新虚拟dom：newVnode，此时就会执行patch比对上次渲染结果oldVnode和新的渲染结果newVnode。
+4.	patch过程遵循深度优先、同层比较的策略；两个节点之间比较时，如果它们拥有子节点，会先比较子节点；比较两组子节点时，会假设头尾节点可能相同先做尝试，没有找到相同节点后才按照通用方式遍历查找；查找结束再按情况处理剩下的节点；借助key通常可以非常精确找到相同节点，因此整个patch过程非常高效。
+80、vue中组件之间的通信方式？
+回答范例：
+1.	组件通信方式大体有以下8种：
+•	props
+•	$emit/$on
+•	$children/$parent
+•	$attrs/$listeners
+•	ref
+•	$root
+•	eventbus
+•	vuex
+2.	根据组件之间关系讨论组件通信最为清晰有效
+•	父子组件
+o	props
+o	$emit/$on
+o	$parent / $children
+o	ref
+o	$attrs / $listeners
+•	兄弟组件
+o	$parent
+o	eventbus
+o	vuex
+•	跨层级关系
+o	provide/inject
+o	$root
+o	eventbus
+o	vuex
+81、什么是vue-loader？
+Vue-loader 是 Webpack 的加载器模块，它使我们可以用 .vue 文件格式编写单文件组件。单文件组件文件有三个部分，即模板、脚本和样式。 vue-loader 模块允许 webpack 使用单独的加载器模块（例如 SASS 或 SCSS 加载器）提取和处理每个部分。该设置使我们可以使用 .vue 文件无缝编写程序。
+vue-loader 模块还允许把静态资源视为模块依赖性，并允许使用 webpack 加载器进行处理。而且还允许在开发过程中进行热重装。
+82、什么是 mixin？
+Mixins 使我们能够为 Vue 组件编写可插拔和可重用的功能。如果你希望在多个组件之间重用一组组件选项，例如生命周期 hook、方法等，则可以将其编写为 mixin，并在组件中简单地引用它。然后将 mixin 的内容合并到组件中。如果你要在 mixin 中定义生命周期 hook，那么它在执行时将优先于组件自己的 hook 。
+83、在开发过程中，如果你的 Vue 程序和后端 API 服务器未在同一主机上运行，该如何代理 API 请求。假设使用 Vue-CLI 3 进行设置？
+假设我们有一个运行在 localhost:4040 上的 Node.js 后端服务器。为了确保代理并可以从组件中访问它，可以配置 vue.config.js 文件并包含 devServer 部分，如下所示：
+在 vue.config.js 文件中：
+module.exports: {
+    devServer: {
+        proxy: {
+            '/api': { 
+                target: ‘http://localhost:4040/api’, 
+                changeOrigin: true 
+            }
+        }
+    }
+}
+84、prop 如何指定其类型要求？
+通过实现 prop 验证选项，可以为单个 prop 指定类型要求。这对生产没有影响，但是会在开发阶段发出警告，从而帮助开发人员识别传入数据和 prop 的特定类型要求的潜在问题。
+配置三个 prop 的例子：
+props: {
+    accountNumber: {
+        type: Number,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+   },
+   favoriteColors: Array
+}
+85、什么是异步组件？
+当大型程序使用大量组件时，从服务器上同时加载所有组件可能是没有意义的。在这种情况下，Vue 允许我们在需要时定义从服务器异步加载的组件。在声明或注册组件时，Vue 接受提供 Promise 的工厂函数。然后可以在调用该组件时对其进行“解析”。
+通过仅加载基本组件并把异步组件的加载推迟到未来的调用时间，可以节省带宽和程序加载时间。
+这是一个异步组件的简单示例。
+new Vue({
+    components: {
+        ‘tweet-box’: () => import(‘./components/async/TweetBox’)
+    }
+}); 
+当以这种方式使用时，Webpack 的代码拆分将用于提供此功能。
+86、ES6经典面试题
+1.箭头函数有哪些特性
+1、箭头函数是匿名函数，不绑定自己的this,arguments,super,new.target
+2、箭头函数会捕获其所在上下文的this值，作为自己的this值，在使用call/apply绑定时，相当于只是传入了参数，对this没有影响
+3、箭头函数不绑定arguments，取而代之用rest参数…解决
+4、箭头函数当方法使用的时候，没有定义this绑定
+5、箭头函数不能作为构造函数，和 new 一起用就会抛出错误
+6、箭头函数没有原型属性
+7、不能简单返回对象字面量
+2.实现数组过滤重复
+  Let s = [...new Set(arr)]
+3.使用json方式实现深拷贝
+let arr2 = JSON.parse(JSON.stringify(arr1));
+4.ES6模板字符串有哪些好处
+ a. 在ES5拼接的时候，如果结构需要换行，必须使用转义符；在ES6中，使用模板字符串，直接使用html结构即可
+b. 在ES5中，单引号和双引号必须注意嵌套问题，在ES6中，就不需要考虑；
+c. 模板字符串中，可以写js语句
+d. 方便简洁，不容易出错；
+5.关于对象扩展的属性简写和属性名表达方式写法，请各举一个例子
+1. 属性的简写：必须属性名和变量名相同
+3. 属性表达式：[]里面可以是变量，字符串，数字，表达式
+注意：如果对象的属性是数字，不可以使用点进行访问
+属性名简写：
+var title = 'offc';
+var size = 10;
+var obj = {
+title,
+size,
+};
+属性名表达式：
+var title = 'offc';
+obj[title] = '简书';
+
+6.手写promise
+var p = new Promise((resolve,reject)={
+if(1){
+resolve(‘成功’)
+}
+else{
+reject(‘失败’);
+}
+})
+p.then((res)=>{}).catch((err)=>{})
+7.用class定义一个类
+class Aniaml{
+static Type = ‘动物’
+constructor(newName){
+this.name = newName
+}
+eat(){conosle.log(‘吃东西’)}
+static sayHi(){
+console.log(‘大家好’)
+}
+}
+
+8.class实现继承
+class Tigger extends Animal{
+constructor(props){
+super(props)
+}
+}
+9.谈一下对async。。。。await的理解
+async...await是基于promise的generator语法糖，它用来等待promise的执行结果，常规函数使用await没有效果；async修饰的函数内部return不会得到预期的结果，会得到一个promise对象；await等待的promise结果是resolve状态的内容，reject状态的内容需要使用try...catch获取，await关键字必须要出现在async修饰的函数中，否则报错。
+10.ES6中的symbol类型有什么作用
+ES6新增了Symbol数据类型，它用来生成一个独一无二的值，它Symbol数据常用来给对象属性赋值，让对象属性具备唯一性，不容易被覆盖。
+11.class类中的super有哪些用法
+Super在类中有两种用法，一个是super方法，一个是super对象；super方法只能出现在constructor方法中，super对象一般出现在子类覆盖父类的方法中。
+12.静态和成员的区别
+静态的变量或方法归类所有，全局独一份，成员的变量或方法归对象所有，每次实例化对象成员方法和成员变量就会得到一份拷贝；对于一些通用性的属性或方法，可以考虑设置为静态。
+
+13.谈一体你多promise的理解
+Promise用来解决异步回调问题，由于js是单线程的，很多异步操作都是依靠回调方法实现的，这种做法在逻辑比较复杂的回调嵌套中会相当复杂；也叫做回调地狱；promise用来将这种繁杂的做法简化，让程序更具备可读性，可维护性；promise内部有三种状态，pedding，fulfilled，rejected；pedding表示程序正在执行但未得到结果，即异步操作没有执行完毕，fulfilled表示程序执行完毕，且执行成功，rejected表示执行完毕但失败；这里的成功和失败都是逻辑意义上的；并非是要报错。其实，promise和回调函数一样，都是要解决数据的传递和消息发送问题，promise中的then一般对应成功后的数据处理，catch一般对应失败后的数据处理。Promise状态一旦确定，就不会再次发生改变
+14.深拷贝的原理
+Js的深拷贝发生在对象的赋值上，对象赋值的时候仅仅是一个引用赋值，也就是说两个不同变量名指向的是同一份内存空间；基本数据类型则不存在这样的行为；要完成对象的深拷贝需要使用递归遍历所有对象的属性进行赋值，也可以使用JSON.stringfy和JSON.parse操作。
+
+15.set和map的区别
+Set是一种类似数组的集合类型，它与数组不同的是，不允许存在重复数据；常用操作方法有：add,delete,has,clear等；遍历使用forEach；
+Map是一种类似对象的集合类型，它与对象不同的是，key可以接受对象类型，常用的操作方法有：set,get,has,delete等；遍历使用forEach
+16.node的特点是什么
+1）它是一个Javascript运行环境
+2）依赖于Chrome V8引擎进行代码解释
+3）事件驱动
+4）非阻塞I/O
+5）轻量、可伸缩，适于实时数据交互应用
+6）单进程，单线程
+
+17.module.exports和exports的区别，请用代码示范
+Exports和module.exports的区别：
+1）exports相当于在js文件的首行写了let exports = module.exports;（但是实际情况不需要写，否则报错）
+2）exports不可以直接赋值，如果直接赋值相当于与module.exports切断了联系，没有了导出功能；
+3）如果exports和module.exports同时导出，exports就失去了导出的功能；
+4）注意点：module.exports只使用一次即可，多个变量输出的时候，可以使用对象的形式
+18.MIME类型有什么作用
+MIME的全称是Multipurpose Internet Mail Extensions，即多用途互联网邮件扩展类型。这是HTTP协议中用来定义文档性质及格式的标准。服务器通过MIME告知响应内容类型，而浏览器则通过MIME类型来确定如何处理文档。
+常见MIME类型：
+application/octet-stream?未知的应用程序文件
+application/json?json数据
